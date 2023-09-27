@@ -25,18 +25,18 @@ import com.example.thewatchlist.data.MainNavOption
 @Composable
 fun MainNavController(
     navController: NavHostController = rememberNavController(),
-    viewModel: MainNavState = viewModel()
+    navState: NavState = viewModel()
 ) {
-    val activeMenuItem = viewModel.activeMenuItem
+    val activeMenuItem = navState.activeMainNavItem
 
     Scaffold(
         bottomBar =  {
             NavigationBar {
-                viewModel.navBarItems.forEach { item ->
+                navState.mainNavItems.forEach { item ->
                     NavigationBarItem(
                         icon = {
                             Image(
-                                painter = painterResource(id = viewModel.getImageId(item)),
+                                painter = painterResource(id = navState.getImageId(item)),
                                 contentDescription = item.mainNavOption.toString(),
                                 modifier = Modifier.size(24.dp)
                             )
@@ -44,7 +44,7 @@ fun MainNavController(
                         label = { Text(item.mainNavOption.toString()) },
                         selected = activeMenuItem == item.mainNavOption,
                         onClick = {
-                            viewModel.setMenuItem(item.mainNavOption)
+                            navState.setMainNavItem(item.mainNavOption)
                             navController.navigate(item.mainNavOption.toString())
                         }
                     )
@@ -55,17 +55,17 @@ fun MainNavController(
         // The navHost draws the composable that corresponds with navController.navigate()
         NavHost(
             navController = navController,
-            startDestination = viewModel.activeMenuItem.toString(),
+            startDestination = navState.activeMainNavItem.toString(),
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(MainNavOption.Search.toString()) {
                 SearchScreen()
             }
             composable(MainNavOption.Movies.toString()) {
-                MediaScreen(mainNavOption = MainNavOption.Movies)
+                MediaScreen(navState = navState)
             }
             composable(MainNavOption.Shows.toString()) {
-                MediaScreen(mainNavOption = MainNavOption.Shows)
+                MediaScreen(navState = navState)
             }
             composable(MainNavOption.Settings.toString()) {
                 SettingsScreen()
