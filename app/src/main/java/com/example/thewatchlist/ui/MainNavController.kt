@@ -62,13 +62,14 @@ fun MainNavController(
                 SearchScreen()
             }
             composable(MainNavOption.Movies.toString()) {
-                MediaScreen(navState = navState)
+                MediaScreen(navState = navState, title = MainNavOption.Movies.toString())
             }
             composable(MainNavOption.Shows.toString()) {
-                MediaScreen(navState = navState)
+                MediaScreen(navState = navState, title = MainNavOption.Shows.toString())
             }
             composable(MainNavOption.Settings.toString()) {
-                SettingsScreen()
+                SettingsScreen(title = MainNavOption.Settings.toString())
+
             }
         }
     }

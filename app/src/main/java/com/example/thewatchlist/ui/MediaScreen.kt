@@ -1,6 +1,9 @@
 package com.example.thewatchlist.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -9,17 +12,23 @@ import com.example.thewatchlist.data.TopNavItem
 import com.example.thewatchlist.data.TopNavOption
 import com.example.thewatchlist.ui.theme.KashmirBlue
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaScreen(
-    navState: NavState
+    navState: NavState,
+    title: String
 ) {
     Column {
+        CenterAlignedTopAppBar(
+            title = { Text(title) }
+        )
+
         TabNavigation(
             activeTopNavOption = navState.activeTopNavItem,
             topNavItems = navState.topNavItems,
-            onClick = { navState.setTopNavItem(it) }
-        )
-        Text(navState.activeMainNavItem.toString() + " Screen")
+            onClick = { navState.setTopNavItem(it) })
+
     }
 }
 
