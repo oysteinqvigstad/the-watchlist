@@ -5,9 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.thewatchlist.R
-import com.example.thewatchlist.data.MainNavItem
-import com.example.thewatchlist.data.MainNavOption
-import com.example.thewatchlist.data.TopNavOption
+import com.example.thewatchlist.data.navigation.MainNavItem
+import com.example.thewatchlist.data.navigation.MainNavOption
+import com.example.thewatchlist.data.navigation.TopNavOption
 
 /**
  * ViewModel that keeps the state of the main menu

@@ -1,4 +1,4 @@
-package com.example.thewatchlist.data
+package com.example.thewatchlist.data.navigation
 
 /**
  * The different options in the main navigation

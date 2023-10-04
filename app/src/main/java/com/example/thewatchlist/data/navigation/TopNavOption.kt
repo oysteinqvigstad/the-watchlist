@@ -1,4 +1,4 @@
-package com.example.thewatchlist.data
+package com.example.thewatchlist.data.navigation
 
 enum class TopNavOption {
     ToWatch,

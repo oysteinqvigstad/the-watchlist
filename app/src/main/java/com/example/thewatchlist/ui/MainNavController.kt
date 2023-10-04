@@ -18,8 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.thewatchlist.data.MainNavOption
-import com.example.thewatchlist.data.TopNavOption
+import com.example.thewatchlist.data.navigation.MainNavOption
+import com.example.thewatchlist.data.navigation.TopNavOption
+import com.example.thewatchlist.ui.screens.DetailScreen
 import com.example.thewatchlist.ui.screens.MovieScreen
 import com.example.thewatchlist.ui.screens.SearchScreen
 import com.example.thewatchlist.ui.screens.SettingsScreen
@@ -68,13 +69,17 @@ fun MainNavController(
                 SearchScreen()
             }
             composable(MainNavOption.Movies.toString()) {
-                MovieScreen(mainNavState = mainNavState, title = MainNavOption.Movies.toString())
+                MovieScreen(mainNavState = mainNavState, title = MainNavOption.Movies.toString(), mainNavController = navController)
             }
             composable(MainNavOption.Shows.toString()) {
                 ShowScreen(mainNavState = mainNavState, title = MainNavOption.Shows.toString())
             }
             composable(MainNavOption.Settings.toString()) {
                 SettingsScreen(title = MainNavOption.Settings.toString())
+            }
+            composable("details/{id}") { backStackEntry ->
+                val parameter = backStackEntry.arguments?.getString("id") ?: ""
+                DetailScreen(id = parameter, navController = navController)
 
             }
         }
