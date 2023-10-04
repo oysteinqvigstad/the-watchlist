@@ -19,24 +19,30 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.thewatchlist.data.MainNavOption
+import com.example.thewatchlist.data.TopNavOption
+import com.example.thewatchlist.ui.screens.MovieScreen
+import com.example.thewatchlist.ui.screens.SearchScreen
+import com.example.thewatchlist.ui.screens.SettingsScreen
+import com.example.thewatchlist.ui.screens.ShowScreen
+import com.example.thewatchlist.ui.theme.KashmirBlue
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavController(
     navController: NavHostController = rememberNavController(),
-    navState: NavState = viewModel()
+    mainNavState: MainNavState = viewModel()
 ) {
-    val activeMenuItem = navState.activeMainNavItem
+    val activeMenuItem = mainNavState.activeMainNavItem
 
     Scaffold(
         bottomBar =  {
             NavigationBar {
-                navState.mainNavItems.forEach { item ->
+                mainNavState.mainNavItems.forEach { item ->
                     NavigationBarItem(
                         icon = {
                             Image(
-                                painter = painterResource(id = navState.getImageId(item)),
+                                painter = painterResource(id = mainNavState.getImageId(item)),
                                 contentDescription = item.mainNavOption.toString(),
                                 modifier = Modifier.size(24.dp)
                             )
@@ -44,7 +50,7 @@ fun MainNavController(
                         label = { Text(item.mainNavOption.toString()) },
                         selected = activeMenuItem == item.mainNavOption,
                         onClick = {
-                            navState.setMainNavItem(item.mainNavOption)
+                            mainNavState.setMainNavItem(item.mainNavOption)
                             navController.navigate(item.mainNavOption.toString())
                         }
                     )
@@ -55,17 +61,17 @@ fun MainNavController(
         // The navHost draws the composable that corresponds with navController.navigate()
         NavHost(
             navController = navController,
-            startDestination = navState.activeMainNavItem.toString(),
+            startDestination = mainNavState.activeMainNavItem.toString(),
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(MainNavOption.Search.toString()) {
                 SearchScreen()
             }
             composable(MainNavOption.Movies.toString()) {
-                MediaScreen(navState = navState, title = MainNavOption.Movies.toString())
+                MovieScreen(mainNavState = mainNavState, title = MainNavOption.Movies.toString())
             }
             composable(MainNavOption.Shows.toString()) {
-                MediaScreen(navState = navState, title = MainNavOption.Shows.toString())
+                ShowScreen(mainNavState = mainNavState, title = MainNavOption.Shows.toString())
             }
             composable(MainNavOption.Settings.toString()) {
                 SettingsScreen(title = MainNavOption.Settings.toString())
@@ -74,4 +80,25 @@ fun MainNavController(
         }
     }
 
+}
+
+@Composable
+fun TabNavigation(
+    activeTopNavOption: TopNavOption = TopNavOption.ToWatch,
+    topNavItems: List<TopNavOption>,
+    onClick: (TopNavOption) -> Unit = {}
+) {
+    TabRow(
+        selectedTabIndex = topNavItems.indexOf(activeTopNavOption),
+        contentColor = KashmirBlue
+
+    ) {
+        topNavItems.forEach { type ->
+            Tab(
+                text = { Text(text = type.toString()) },
+                selected = type == activeTopNavOption,
+                onClick = { onClick(type) }
+            )
+        }
+    }
 }

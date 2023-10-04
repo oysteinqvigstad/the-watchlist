@@ -7,5 +7,5 @@ data class MainNavItem(
     val mainNavOption: MainNavOption,
     val icon: Int,
     val icon2: Int,
-    val route: String
+    val text: String
 )

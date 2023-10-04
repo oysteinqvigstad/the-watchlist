@@ -8,4 +8,5 @@ enum class MainNavOption {
     Movies,
     Shows,
     Settings
+
 }

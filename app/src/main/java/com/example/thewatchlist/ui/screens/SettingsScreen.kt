@@ -1,4 +1,4 @@
-package com.example.thewatchlist.ui
+package com.example.thewatchlist.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
