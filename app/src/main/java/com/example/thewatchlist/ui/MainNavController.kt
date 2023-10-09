@@ -32,7 +32,8 @@ import com.example.thewatchlist.ui.theme.KashmirBlue
 @Composable
 fun MainNavController(
     navController: NavHostController = rememberNavController(),
-    mainNavState: MainNavState = viewModel()
+    mainNavState: MainNavState = viewModel(),
+    dataViewModel: DataViewModel = viewModel()
 ) {
     val activeMenuItem = mainNavState.activeMainNavItem
 
@@ -66,7 +67,7 @@ fun MainNavController(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(MainNavOption.Search.toString()) {
-                SearchScreen()
+                SearchScreen(dataViewModel)
             }
             composable(MainNavOption.Movies.toString()) {
                 MovieScreen(mainNavState = mainNavState, title = MainNavOption.Movies.toString(), mainNavController = navController)

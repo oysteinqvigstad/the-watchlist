@@ -1,4 +1,4 @@
-package com.example.thewatchlist.tmdb
+package com.example.thewatchlist.network
 
 import android.util.Log
 import info.movito.themoviedbapi.TmdbApi
@@ -7,8 +7,17 @@ import info.movito.themoviedbapi.TmdbSearch
 import info.movito.themoviedbapi.TmdbTV
 import info.movito.themoviedbapi.TmdbTvSeasons
 import info.movito.themoviedbapi.model.MovieDb
+import info.movito.themoviedbapi.model.Multi
 import info.movito.themoviedbapi.model.core.MovieResultsPage
 import info.movito.themoviedbapi.model.tv.TvSeries
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+sealed interface SearchStatus {
+    data class Success(val results: List<Multi>): SearchStatus
+    object Loading: SearchStatus
+    object Error: SearchStatus
+}
 
 object Tmdb {
     private val api : TmdbApi by lazy {
@@ -54,5 +63,26 @@ object Tmdb {
 
     suspend fun searchAll() {
         Log.d("Tmdb", "Function not implemented.")
+    }
+
+    suspend fun searchMulti(title: String): List<Multi>? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = tmdbSearch.searchMulti(title, "en", 1).results
+                response.mapNotNull { res ->
+                    when (res.mediaType) {
+                        Multi.MediaType.MOVIE ->
+                            tmdbMovies.getMovie((res as MovieDb).id, "en")
+                        Multi.MediaType.TV_SERIES ->
+                            tmdbTvSeries.getSeries((res as TvSeries).id, "en")
+                        else ->
+                            null
+                    }
+                }
+            } catch (e: Exception) {
+                Log.d("d", e.cause.toString())
+                null
+            }
+        }
     }
 }
