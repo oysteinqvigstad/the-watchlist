@@ -15,10 +15,8 @@ class DataViewModel : ViewModel() {
     var searchStatus: SearchStatus by mutableStateOf(SearchStatus.Loading)
         private set
 
-    init {
-    }
-
     suspend fun searchTmdb(title: String) {
+        searchStatus = SearchStatus.Loading
         viewModelScope.launch {
             searchStatus = try {
                 val results = Tmdb.searchMulti(title)
