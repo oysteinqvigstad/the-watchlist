@@ -2,7 +2,6 @@ package com.example.thewatchlist.ui.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -35,22 +34,18 @@ fun MovieScreen(
             topNavItems = mainNavState.topNavMovieItems,
             onClick = { mainNavState.setMovieNavItem(it) })
         
-        Button(
-            onClick = { mainNavController.navigate("details/test 1-2-3") }
-        ) {
-          Text(text = "Navigating to details screen!")
-        }
-
         dataViewModel.mediaList.forEach {
             if (it is Movie && it.status == mainNavState.activeMovieNavItem) {
                 Banner(
-                    item = it,
+                    media = it,
                     activeBottomNav = MainNavOption.Movies,
-                    onClick = { dataViewModel.addMediaToList(it) }
+                    onDetails = {
+                        dataViewModel.setActiveDetailsMediaItem(it)
+                        mainNavController.navigate("details")
+                    },
+                    onAdd = {}
                 )
-        }
-
-        }
+        } }
 
 
     }

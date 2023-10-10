@@ -22,6 +22,9 @@ class DataViewModel : ViewModel() {
     var searchStatus: SearchStatus by mutableStateOf(SearchStatus.Loading)
         private set
 
+    var detailsMediaItem: Media? by mutableStateOf(null)
+        private set
+
     var mediaList: SnapshotStateList<Media> = mutableStateListOf()
         private set
 
@@ -47,5 +50,9 @@ class DataViewModel : ViewModel() {
 
     fun addMediaToList(media: Media) {
         mediaList += media
+    }
+
+    fun setActiveDetailsMediaItem(media: Media) {
+        detailsMediaItem = media
     }
 }

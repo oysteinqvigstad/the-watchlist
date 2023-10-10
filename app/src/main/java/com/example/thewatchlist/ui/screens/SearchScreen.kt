@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.network.SearchStatus
 import com.example.thewatchlist.ui.DataViewModel
@@ -15,7 +16,8 @@ import com.example.thewatchlist.ui.components.Banner
 
 @Composable
 fun SearchScreen(
-    dataViewModel: DataViewModel
+    dataViewModel: DataViewModel,
+    mainNavController: NavController
 ) {
 
     LaunchedEffect(Unit) {
@@ -28,9 +30,13 @@ fun SearchScreen(
         when (val res = dataViewModel.searchStatus) {
             is SearchStatus.Success -> { res.results.forEach {
                 Banner(
-                    item = it,
+                    media = it,
                     activeBottomNav = MainNavOption.Search,
-                    onClick = { dataViewModel.addMediaToList(it) }
+                    onDetails = {
+                        dataViewModel.setActiveDetailsMediaItem(it)
+                        mainNavController.navigate("details")
+                    },
+                    onAdd = { dataViewModel.addMediaToList(it) }
                     )
             } }
             is SearchStatus.Loading -> Loading()

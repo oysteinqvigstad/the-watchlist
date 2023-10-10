@@ -67,7 +67,10 @@ fun MainNavController(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(MainNavOption.Search.toString()) {
-                SearchScreen(dataViewModel = dataViewModel)
+                SearchScreen(
+                    dataViewModel = dataViewModel,
+                    mainNavController = navController
+                )
             }
             composable(MainNavOption.Movies.toString()) {
                 MovieScreen(
@@ -82,16 +85,18 @@ fun MainNavController(
                 ShowScreen(
                     mainNavState = mainNavState,
                     title = MainNavOption.Shows.toString(),
-                    dataViewModel = dataViewModel
+                    mainNavController = navController,
+                    dataViewModel = dataViewModel,
                 )
             }
             composable(MainNavOption.Settings.toString()) {
                 SettingsScreen(title = MainNavOption.Settings.toString())
             }
-            composable("details/{id}") { backStackEntry ->
-                val parameter = backStackEntry.arguments?.getString("id") ?: ""
-                DetailScreen(id = parameter, navController = navController)
-
+            composable("details") {
+                DetailScreen(
+                    navController = navController,
+                    dataViewModel = dataViewModel
+                )
             }
         }
     }

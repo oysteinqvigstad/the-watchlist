@@ -1,9 +1,13 @@
 package com.example.thewatchlist.ui.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.thewatchlist.data.media.Media
 import com.example.thewatchlist.data.media.Movie
 import com.example.thewatchlist.data.media.TV
@@ -11,21 +15,24 @@ import com.example.thewatchlist.data.navigation.MainNavOption
 
 @Composable
 fun Banner(
-    item: Media,
+    media: Media,
     activeBottomNav: MainNavOption,
-    onClick: (Media) -> Unit
+    onDetails: (Media) -> Unit,
+    onAdd: (Media) -> Unit
 ) {
 
-    when (item) {
+    when (media) {
         is Movie -> MovieBanner(
-            movie = item,
+            movie = media,
             activeBottomNav = MainNavOption.Search,
-            onClick = onClick
+            onAdd = onAdd,
+            onDetails = onDetails
         )
         is TV -> TVBanner(
-            tv = item,
+            tv = media,
             activeBottomNav = MainNavOption.Search,
-            onClick = onClick
+            onAdd = onAdd,
+            onDetails = onDetails
         )
     }
 }
@@ -34,16 +41,26 @@ fun Banner(
 fun TVBanner(
     tv: TV,
     activeBottomNav: MainNavOption,
-    onClick: (Media) -> Unit
+    onAdd: (Media) -> Unit,
+    onDetails: (Media) -> Unit
 ) {
-    Text(text = "TV: " + tv.tmdb.name, modifier = Modifier.clickable { onClick(tv) })
+    Row {
+        Text(text = "TV: " + tv.tmdb.name, modifier = Modifier.clickable { onDetails(tv) })
+        Spacer(modifier = Modifier.padding(start = 2.dp))
+        Text(text = "+", modifier = Modifier.clickable { onAdd(tv) })
+    }
 }
 
 @Composable
 fun MovieBanner(
     movie: Movie,
     activeBottomNav: MainNavOption,
-    onClick: (Media) -> Unit
+    onAdd: (Media) -> Unit,
+    onDetails: (Media) -> Unit
 ) {
-    Text(text = "Movie: " + movie.tmdb.title, modifier = Modifier.clickable { onClick(movie) })
+    Row {
+        Text(text = "Movie: " + movie.tmdb.title, modifier = Modifier.clickable { onDetails(movie) })
+        Spacer(modifier = Modifier.padding(start = 2.dp))
+        Text(text = "+", modifier = Modifier.clickable { onAdd(movie) })
+    }
 }

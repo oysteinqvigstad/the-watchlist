@@ -6,7 +6,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.example.thewatchlist.data.media.Movie
+import androidx.navigation.NavController
 import com.example.thewatchlist.data.media.TV
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.ui.DataViewModel
@@ -20,6 +20,7 @@ import com.example.thewatchlist.ui.components.Banner
 fun ShowScreen(
     mainNavState: MainNavState,
     title: String,
+    mainNavController: NavController,
     dataViewModel: DataViewModel
 ) {
     Column {
@@ -35,9 +36,13 @@ fun ShowScreen(
         dataViewModel.mediaList.forEach {
             if (it is TV && it.status == mainNavState.activeShowNavItem) {
                 Banner(
-                    item = it,
+                    media = it,
                     activeBottomNav = MainNavOption.Movies,
-                    onClick = { dataViewModel.addMediaToList(it) }
+                    onDetails = {
+                        dataViewModel.setActiveDetailsMediaItem(it)
+                        mainNavController.navigate("details")
+                    },
+                    onAdd = {}
                 )
             }
 

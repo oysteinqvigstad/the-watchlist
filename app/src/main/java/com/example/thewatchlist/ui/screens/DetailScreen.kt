@@ -11,11 +11,27 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
+import com.example.thewatchlist.data.media.Movie
+import com.example.thewatchlist.data.media.TV
+import com.example.thewatchlist.ui.DataViewModel
+import com.example.thewatchlist.ui.components.DetailedInfo
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(id: String, navController: NavController) {
+fun DetailScreen(
+    navController: NavController,
+    dataViewModel: DataViewModel
+) {
+
+    val title = dataViewModel.detailsMediaItem?.let {
+        when (it) {
+            is Movie -> (it as Movie).tmdb.title
+            is TV -> (it as TV).tmdb.name
+            else -> ""
+        }
+    }
+
     Column {
         CenterAlignedTopAppBar(
             navigationIcon = {
@@ -25,8 +41,9 @@ fun DetailScreen(id: String, navController: NavController) {
                     Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
                 }
             },
-            title = { Text(id) }
+            title = { Text(text = title ?: "") }
         )
+        // TODO: handle redirect if null
+        DetailedInfo(media = dataViewModel.detailsMediaItem!!)
     }
-
 }
