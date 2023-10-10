@@ -2,24 +2,24 @@ package com.example.thewatchlist.ui.components
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import info.movito.themoviedbapi.model.MovieDb
-import info.movito.themoviedbapi.model.Multi
-import info.movito.themoviedbapi.model.tv.TvSeries
+import com.example.thewatchlist.data.media.Media
+import com.example.thewatchlist.data.media.Movie
+import com.example.thewatchlist.data.media.TV
 
 @Composable
-fun Banner(item: Multi) {
+fun Banner(item: Media) {
     when (item) {
-        is MovieDb -> MovieBanner(movie = item as MovieDb)
-        is TvSeries -> TVBanner(tvSeries = item as TvSeries)
+        is Movie -> MovieBanner(movie = item)
+        is TV -> TVBanner(tv = item)
     }
 }
 
 @Composable
-fun TVBanner(tvSeries: TvSeries) {
-    Text(text = tvSeries.name)
+fun TVBanner(tv: TV) {
+    Text(text = tv.tmdb.name)
 }
 
 @Composable
-fun MovieBanner(movie: MovieDb) {
-    Text(text = movie.title)
+fun MovieBanner(movie: Movie) {
+    Text(text = movie.tmdb.title)
 }

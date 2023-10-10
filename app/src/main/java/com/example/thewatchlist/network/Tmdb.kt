@@ -1,6 +1,7 @@
 package com.example.thewatchlist.network
 
 import android.util.Log
+import com.example.thewatchlist.data.media.Media
 import info.movito.themoviedbapi.TmdbApi
 import info.movito.themoviedbapi.TmdbMovies
 import info.movito.themoviedbapi.TmdbSearch
@@ -14,7 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 sealed interface SearchStatus {
-    data class Success(val results: List<Multi>): SearchStatus
+    data class Success(val results: List<Media>): SearchStatus
     object Loading: SearchStatus
     object Error: SearchStatus
 }
@@ -24,19 +25,19 @@ object Tmdb {
         TmdbApi("c7a5e80f157dd58ea1532f561b5737a9")
     }
 
-    val tmdbMovies : TmdbMovies by lazy {
+    private val tmdbMovies : TmdbMovies by lazy {
         api.movies
     }
 
-    val tmdbTvSeries : TmdbTV by lazy {
+    private val tmdbTvSeries : TmdbTV by lazy {
         api.tvSeries
     }
 
-    val tmdbTvSeasons : TmdbTvSeasons by lazy {
+    private val tmdbTvSeasons : TmdbTvSeasons by lazy {
         api.tvSeasons
     }
 
-    val tmdbSearch : TmdbSearch by lazy {
+    private val tmdbSearch : TmdbSearch by lazy {
         api.search
     }
 
