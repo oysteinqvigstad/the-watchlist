@@ -67,13 +67,23 @@ fun MainNavController(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(MainNavOption.Search.toString()) {
-                SearchScreen(dataViewModel)
+                SearchScreen(dataViewModel = dataViewModel)
             }
             composable(MainNavOption.Movies.toString()) {
-                MovieScreen(mainNavState = mainNavState, title = MainNavOption.Movies.toString(), mainNavController = navController)
+                MovieScreen(
+                    mainNavState = mainNavState,
+                    title = MainNavOption.Movies.toString(),
+                    mainNavController = navController,
+                    dataViewModel = dataViewModel
+                )
+
             }
             composable(MainNavOption.Shows.toString()) {
-                ShowScreen(mainNavState = mainNavState, title = MainNavOption.Shows.toString())
+                ShowScreen(
+                    mainNavState = mainNavState,
+                    title = MainNavOption.Shows.toString(),
+                    dataViewModel = dataViewModel
+                )
             }
             composable(MainNavOption.Settings.toString()) {
                 SettingsScreen(title = MainNavOption.Settings.toString())

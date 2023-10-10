@@ -8,8 +8,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
+import com.example.thewatchlist.data.media.Movie
+import com.example.thewatchlist.data.navigation.MainNavOption
+import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.MainNavState
 import com.example.thewatchlist.ui.TabNavigation
+import com.example.thewatchlist.ui.components.Banner
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -17,6 +21,7 @@ import com.example.thewatchlist.ui.TabNavigation
 fun MovieScreen(
     mainNavState: MainNavState,
     mainNavController: NavController,
+    dataViewModel: DataViewModel,
     title: String
 ) {
     
@@ -35,7 +40,19 @@ fun MovieScreen(
         ) {
           Text(text = "Navigating to details screen!")
         }
-        
+
+        dataViewModel.mediaList.forEach {
+            if (it is Movie && it.status == mainNavState.activeMovieNavItem) {
+                Banner(
+                    item = it,
+                    activeBottomNav = MainNavOption.Movies,
+                    onClick = { dataViewModel.addMediaToList(it) }
+                )
+        }
+
+        }
+
+
     }
     
     

@@ -1,10 +1,13 @@
 package com.example.thewatchlist.ui
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.thewatchlist.data.media.Media
 import com.example.thewatchlist.data.media.Movie
 import com.example.thewatchlist.data.media.TV
 import com.example.thewatchlist.network.SearchStatus
@@ -17,6 +20,9 @@ import java.io.IOException
 
 class DataViewModel : ViewModel() {
     var searchStatus: SearchStatus by mutableStateOf(SearchStatus.Loading)
+        private set
+
+    var mediaList: SnapshotStateList<Media> = mutableStateListOf()
         private set
 
     suspend fun searchTmdb(title: String) {
@@ -37,5 +43,9 @@ class DataViewModel : ViewModel() {
                 SearchStatus.Error
             }
         }
+    }
+
+    fun addMediaToList(media: Media) {
+        mediaList += media
     }
 }
