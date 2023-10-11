@@ -28,6 +28,7 @@ import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.components.Banner
 import info.movito.themoviedbapi.model.MovieDb
 import info.movito.themoviedbapi.model.tv.TvSeries
+import kotlinx.coroutines.awaitAll
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +40,7 @@ fun SearchScreen(
 
     var text by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
-//    var search by remember { mutableStateOf(false) }    // activate search
+    var search by remember { mutableStateOf(false) }    // activate search
 
 
     Column {
@@ -49,12 +50,8 @@ fun SearchScreen(
             query = text,
             onQueryChange = { text = it },
             onSearch = {
-
-                // Need to search for movie/series here
-//                search = true
-
-
-                active = false
+                search = true   // Set activate search as true
+                active = false  // If this is removed, something with the search doesn't quite work
             },
             active = active,
             onActiveChange = { active = it },
@@ -81,42 +78,57 @@ fun SearchScreen(
                 }
             },
 
-            ) {
+        ) {
+            // Searches with the input,
+            // but I have set the search tab to close when search button is pressed.
+            // When trying to remove it, the search functionality doesn't work properly
+            // Don't know why ...
+            if(search) {
+                SearchForMovieSeries(text, dataViewModel, mainNavController)
+            }
 
-        }
-
-/*
-        // Searches once with the input,
-        // but doesn't run again if we want to search for something else
-        if(search) { LaunchedEffect(Unit) { dataViewModel.searchTmdb(text) } }
-*/
-
-
-        // Searches only once when the app first starts, therefore searches for nothing
-        LaunchedEffect(Unit) {
-            dataViewModel.searchTmdb(text)
-        }
-
-        Text(text = "online søk for '$text':")
-        Spacer(modifier = Modifier.padding(bottom = 10.dp))
-        when (val res = dataViewModel.searchStatus) {
-            is SearchStatus.Success -> { res.results.forEach {
-                Banner(
-                    media = it,
-                    activeBottomNav = MainNavOption.Search,
-                    onDetails = {
-                        dataViewModel.setActiveDetailsMediaItem(it)
-                        mainNavController.navigate("details")
-                    },
-                    onAdd = { dataViewModel.addMediaToList(it) }
-                )
-            } }
-            is SearchStatus.Loading -> Loading()
-            is SearchStatus.Error -> Error()
         }
 
     }
 }
+
+/**
+ * Function to handle search on movies and series.
+ * @param text - The users input to search for
+ * @param dataViewModel
+ * @param mainNavController
+ */
+@Composable
+fun SearchForMovieSeries(
+    text: String,
+    dataViewModel: DataViewModel,
+    mainNavController: NavController
+) {
+
+    // Searches only once when the app first starts, therefore searches for nothing
+    LaunchedEffect(Unit) {
+        dataViewModel.searchTmdb(text)
+    }
+
+    Text(text = "online søk for '$text':")
+    Spacer(modifier = Modifier.padding(bottom = 10.dp))
+    when (val res = dataViewModel.searchStatus) {
+        is SearchStatus.Success -> { res.results.forEach {
+            Banner(
+                media = it,
+                activeBottomNav = MainNavOption.Search,
+                onDetails = {
+                    dataViewModel.setActiveDetailsMediaItem(it)
+                    mainNavController.navigate("details")
+                },
+                onAdd = { dataViewModel.addMediaToList(it) }
+            )
+        } }
+        is SearchStatus.Loading -> Loading()
+        is SearchStatus.Error -> Error()
+    }
+}
+
 
 @Preview
 @Composable
