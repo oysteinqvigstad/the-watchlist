@@ -18,6 +18,7 @@ sealed interface SearchStatus {
     data class Success(val results: List<Media>): SearchStatus
     object Loading: SearchStatus
     object Error: SearchStatus
+    object Waiting: SearchStatus
 }
 
 object Tmdb {
