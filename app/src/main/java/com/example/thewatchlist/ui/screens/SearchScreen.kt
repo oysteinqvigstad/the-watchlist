@@ -19,12 +19,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.network.SearchStatus
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.components.Banner
+import info.movito.themoviedbapi.model.MovieDb
+import info.movito.themoviedbapi.model.tv.TvSeries
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,11 +118,13 @@ fun SearchScreen(
     }
 }
 
+@Preview
 @Composable
 fun Loading() {
     Text(text = "Loading...")
 }
 
+@Preview
 @Composable
 fun Error() {
     // TODO: handle better error messages
