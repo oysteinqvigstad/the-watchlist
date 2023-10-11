@@ -49,7 +49,9 @@ class DataViewModel : ViewModel() {
     }
 
     fun addMediaToList(media: Media) {
-        mediaList += media
+        if (mediaList.find { media.id == it.id } == null) {
+            mediaList += media
+        }
     }
 
     fun setActiveDetailsMediaItem(media: Media) {

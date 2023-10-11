@@ -7,12 +7,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.network.SearchStatus
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.components.Banner
+import info.movito.themoviedbapi.model.MovieDb
+import info.movito.themoviedbapi.model.tv.TvSeries
 
 @Composable
 fun SearchScreen(
@@ -46,11 +49,13 @@ fun SearchScreen(
     }
 }
 
+@Preview
 @Composable
 fun Loading() {
     Text(text = "Loading...")
 }
 
+@Preview
 @Composable
 fun Error() {
     // TODO: handle better error messages

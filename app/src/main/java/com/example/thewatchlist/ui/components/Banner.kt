@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.thewatchlist.data.media.Media
 import com.example.thewatchlist.data.media.Movie
@@ -24,13 +25,13 @@ fun Banner(
     when (media) {
         is Movie -> MovieBanner(
             movie = media,
-            activeBottomNav = MainNavOption.Search,
+            activeBottomNav = activeBottomNav,
             onAdd = onAdd,
             onDetails = onDetails
         )
         is TV -> TVBanner(
             tv = media,
-            activeBottomNav = MainNavOption.Search,
+            activeBottomNav = activeBottomNav,
             onAdd = onAdd,
             onDetails = onDetails
         )
