@@ -1,10 +1,12 @@
 package com.example.thewatchlist.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -19,15 +21,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.network.SearchStatus
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.components.Banner
-import info.movito.themoviedbapi.model.MovieDb
-import info.movito.themoviedbapi.model.tv.TvSeries
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,97 +35,114 @@ fun SearchScreen(
     dataViewModel: DataViewModel,
     mainNavController: NavController
 ) {
-
-    var text by remember { mutableStateOf("") }
-    var active by remember { mutableStateOf(false) }
-//    var search by remember { mutableStateOf(false) }    // activate search
-
+    var searchText: String? by remember { mutableStateOf(null) }
 
     Column {
+            SearchField(searchValue = {searchText = it})
+            SearchResults(
+                dataViewModel = dataViewModel,
+                mainNavController = mainNavController,
+                searchText = searchText
+            )
+    }
+}
 
-        SearchBar(
-            modifier = Modifier.fillMaxWidth(),
-            query = text,
-            onQueryChange = { text = it },
-            onSearch = {
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchField(
+    searchValue: (String) -> Unit
+) {
+    var text by remember { mutableStateOf("") }
+    var active by remember { mutableStateOf(false) }
 
-                // Need to search for movie/series here
-//                search = true
-
-
-                active = false
-            },
-            active = active,
-            onActiveChange = { active = it },
-            placeholder = { Text(text = "Search") },
-            leadingIcon = {
+    SearchBar(
+        modifier = Modifier.fillMaxWidth(),
+        query = text,
+        onQueryChange = { text = it },
+        onSearch = {
+            searchValue(text)
+            active = false
+        },
+        active = active,
+        onActiveChange = { active = it },
+        placeholder = { Text(text = "Search") },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search Icon"
+            )
+        },
+        trailingIcon = {
+            if (active) {
                 Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search Icon"
-                )
-            },
-            trailingIcon = {
-                if(active) {
-                    Icon(
-                        modifier = Modifier.clickable {
-                            if(text.isNotEmpty()) {
-                                text = ""
-                            } else {
-                                active = false
-                            }
-                        },
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close Icon"
-                    )
-                }
-            },
-
-            ) {
-
-        }
-
-/*
-        // Searches once with the input,
-        // but doesn't run again if we want to search for something else
-        if(search) { LaunchedEffect(Unit) { dataViewModel.searchTmdb(text) } }
-*/
-
-
-        // Searches only once when the app first starts, therefore searches for nothing
-        LaunchedEffect(Unit) {
-            dataViewModel.searchTmdb(text)
-        }
-
-        Text(text = "online søk for '$text':")
-        Spacer(modifier = Modifier.padding(bottom = 10.dp))
-        when (val res = dataViewModel.searchStatus) {
-            is SearchStatus.Success -> { res.results.forEach {
-                Banner(
-                    media = it,
-                    activeBottomNav = MainNavOption.Search,
-                    onDetails = {
-                        dataViewModel.setActiveDetailsMediaItem(it)
-                        mainNavController.navigate("details")
+                    modifier = Modifier.clickable {
+                        if (text.isNotEmpty()) {
+                            text = ""
+                        } else {
+                            active = false
+                        }
                     },
-                    onAdd = { dataViewModel.addMediaToList(it) }
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close Icon"
                 )
-            } }
-            is SearchStatus.Loading -> Loading()
-            is SearchStatus.Error -> Error()
-        }
+            }
+        },
+
+        ) {
 
     }
 }
 
-@Preview
+
+
 @Composable
-fun Loading() {
+fun SearchResults(
+    dataViewModel: DataViewModel,
+    mainNavController: NavController,
+    searchText: String?,
+
+
+) {
+    LaunchedEffect(searchText) {
+        searchText?.let {
+            Log.d("me", "logged $searchText")
+            dataViewModel.searchTmdb(it)
+        }
+    }
+    when (val res = dataViewModel.searchStatus) {
+        is SearchStatus.Success -> {
+            LazyColumn {
+                res.results.forEach {
+                    item {
+                        Banner(
+                            media = it,
+                            activeBottomNav = MainNavOption.Search,
+                            onDetails = {
+                                dataViewModel.setActiveDetailsMediaItem(it)
+                                mainNavController.navigate("details")
+                            },
+                            onAdd = { dataViewModel.addMediaToList(it) }
+                        )
+                    }
+            }
+
+        } }
+        is SearchStatus.Loading -> LoadingIndicator()
+        is SearchStatus.Error -> ErrorMessage()
+        is SearchStatus.Waiting -> {}
+    }
+
+}
+
+
+
+@Composable
+fun LoadingIndicator() {
     Text(text = "Loading...")
 }
 
-@Preview
 @Composable
-fun Error() {
-    // TODO: handle better error messages
+fun ErrorMessage() {
+//     TODO: handle better error messages
     Text(text = "something went wrong")
 }
