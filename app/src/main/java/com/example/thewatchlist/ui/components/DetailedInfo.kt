@@ -4,12 +4,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,28 +25,38 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.thewatchlist.data.media.Media
 import com.example.thewatchlist.data.media.Movie
 import com.example.thewatchlist.data.media.TV
+import com.example.thewatchlist.ui.DataViewModel
+import info.movito.themoviedbapi.model.tv.TvEpisode
+import info.movito.themoviedbapi.model.tv.TvSeason
 
 @Composable
-fun DetailedInfo(media: Media) {
+fun DetailedInfo(
+    media: Media,
+    dataViewModel: DataViewModel
+) {
 
     when (media) {
         is Movie -> DetailedMovie(
-            movie = media,
+            movie = media
         )
         is TV -> DetailedTV(
             tv = media,
+            onCheckmark = { state, tv -> dataViewModel.setEpisodeCheckmark(state, tv, media) }
         )
     }
 }
 
 @Composable
-fun DetailedMovie(movie: Movie) {
+fun DetailedMovie(
+    movie: Movie
+) {
     Text(text = movie.tmdb.title)
     Text(text = movie.tmdb.releaseDate)
     Text(text = movie.tmdb.runtime.toString())
@@ -48,26 +64,33 @@ fun DetailedMovie(movie: Movie) {
 }
 
 @Composable
-fun DetailedTV(tv: TV) {
-    Text(text = tv.tmdb.name)
-    Text(text = tv.tmdb.firstAirDate)
-    Text(text = tv.tmdb.episodeRuntime.toString())
-    Text(text = tv.tmdb.overview)
-    test()
-}
+fun DetailedTV(
+    tv: TV,
+    onCheckmark: (Boolean, TvEpisode) -> Unit
+) {
 
 
-@Preview
-@Composable
-fun test() {
     LazyColumn {
-        item { DetailedTVSeasons(seasonTitle = "Season 1") }
+        item { Text(text = tv.tmdb.name) }
+        item { Text(text = tv.tmdb.firstAirDate) }
+        item { Text(text = tv.tmdb.episodeRuntime.toString()) }
+        item { Text(text = tv.tmdb.overview) }
+        tv.tmdb.seasons.forEach {
+            item { DetailedTVSeasons(it, tv.seenList, onCheckmark) }
+        }
     }
 }
 
+
 @Composable
-fun DetailedTVSeasons(seasonTitle: String) {
+fun DetailedTVSeasons(
+    season: TvSeason,
+    seenList: MutableSet<Pair<Int, Int>>,
+    onCheckmark: (Boolean, TvEpisode) -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
+
+
 
     Card {
         Column(
@@ -77,12 +100,30 @@ fun DetailedTVSeasons(seasonTitle: String) {
         ) {
 
         }
-        Text(
-            text = seasonTitle,
-            style = MaterialTheme.typography.headlineSmall
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ){
+
+            Text(
+                text = season.name,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(start = 8.dp, top = 2.dp, bottom = 2.dp)
+
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowUp,
+                contentDescription = "Collapse/Expand arrow",
+                modifier = Modifier
+                    .size(24.dp)
+                    .rotate(if (expanded) 0f else 180f)
+            )
+
+        }
+
         if (expanded) {
-            DetailedEpisodeList("episode 1", 25)
+            DetailedEpisodeList(season, seenList, onCheckmark)
         }
 
     }
@@ -91,13 +132,28 @@ fun DetailedTVSeasons(seasonTitle: String) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DetailedEpisodeList(text: String, numberOfEpisodes: Int) {
-    FlowRow {
+fun DetailedEpisodeList(
+    season: TvSeason,
+    seenList: MutableSet<Pair<Int, Int>>,
+    onCheckmark: (Boolean, TvEpisode) -> Unit) {
 
-        (1..numberOfEpisodes).forEach {
-            CustomCheckboxWithText(episodeNumber = it, isChecked = false)
-        }
+
+    season.episodes.forEach {
+        ListItem(
+            headlineContent = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = String.format("S%02dE%02d: %s", it.seasonNumber, it.episodeNumber, it.name))
+                } },
+            supportingContent = {
+                Text(text = it.overview, maxLines = 3, overflow = TextOverflow.Ellipsis)
+            },
+            trailingContent = { Checkbox(
+                checked = seenList.contains(Pair(it.seasonNumber, it.episodeNumber)),
+                onCheckedChange = {state -> onCheckmark(state, it)}) }
+        )
     }
+
+
 }
 
 
@@ -116,7 +172,6 @@ fun CustomCheckboxWithText(
             modifier = Modifier.padding(all = 0.dp),
             checked = isChecked,
             onCheckedChange = {}, //onCheckedChange,
-//            modifier = Modifier.padding(8.dp)
         )
         Text(
             text = String.format("%02d", episodeNumber),

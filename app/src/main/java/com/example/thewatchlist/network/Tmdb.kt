@@ -10,6 +10,8 @@ import info.movito.themoviedbapi.TmdbTvSeasons
 import info.movito.themoviedbapi.model.MovieDb
 import info.movito.themoviedbapi.model.Multi
 import info.movito.themoviedbapi.model.core.MovieResultsPage
+import info.movito.themoviedbapi.model.tv.TvEpisode
+import info.movito.themoviedbapi.model.tv.TvSeason
 import info.movito.themoviedbapi.model.tv.TvSeries
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -87,4 +89,17 @@ object Tmdb {
             }
         }
     }
+
+
+    suspend fun getEpisodes(seriesId: Int, seasonId: Int): List<TvEpisode>? {
+        return withContext(Dispatchers.IO) {
+            try {
+                Log.d("me", "hello?")
+                tmdbTvSeasons.getSeason(seriesId, seasonId, "en").episodes
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+
 }

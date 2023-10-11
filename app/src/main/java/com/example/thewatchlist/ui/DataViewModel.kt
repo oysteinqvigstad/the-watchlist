@@ -13,7 +13,9 @@ import com.example.thewatchlist.data.media.TV
 import com.example.thewatchlist.network.SearchStatus
 import com.example.thewatchlist.network.Tmdb
 import info.movito.themoviedbapi.model.MovieDb
+import info.movito.themoviedbapi.model.tv.TvEpisode
 import info.movito.themoviedbapi.model.tv.TvSeries
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -48,9 +50,39 @@ class DataViewModel : ViewModel() {
         }
     }
 
+    suspend fun updateEpisodes(tv: TV) {
+        viewModelScope.async { tv.updateEpisodes() }.await()
+        updateMediaEntry(tv)
+
+    }
+
+
     fun addMediaToList(media: Media) {
         if (mediaList.find { media.id == it.id } == null) {
             mediaList += media
+        }
+    }
+
+    fun setEpisodeCheckmark(checked: Boolean, episode: TvEpisode, tv: TV) {
+        val seenEntry = Pair(episode.seasonNumber, episode.episodeNumber)
+        if (checked) {
+            tv.seenList.add(seenEntry)
+        } else {
+            tv.seenList.remove(seenEntry)
+        }
+        updateMediaEntry(tv)
+
+
+
+    }
+
+    fun updateMediaEntry(media: Media) {
+        val index = mediaList.indexOf(media)
+        if (index >= 0) {
+            mediaList[index] = media.clone()
+        }
+        if (detailsMediaItem?.id == media.id) {
+            detailsMediaItem = media.clone()
         }
     }
 

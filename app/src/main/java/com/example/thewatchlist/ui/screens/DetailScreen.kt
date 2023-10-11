@@ -10,6 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
 import com.example.thewatchlist.data.media.Movie
 import com.example.thewatchlist.data.media.TV
@@ -23,14 +24,23 @@ fun DetailScreen(
     navController: NavController,
     dataViewModel: DataViewModel
 ) {
-
-    val title = dataViewModel.detailsMediaItem?.let {
+    // TODO: Handle redirection if null
+    val media = dataViewModel.detailsMediaItem!!
+    val title = media.let {
         when (it) {
             is Movie -> (it as Movie).tmdb.title
             is TV -> (it as TV).tmdb.name
             else -> ""
         }
     }
+
+    LaunchedEffect(Unit) {
+        if (media is TV) {
+            dataViewModel.updateEpisodes(media)
+        }
+    }
+
+
 
     Column {
         CenterAlignedTopAppBar(
@@ -44,6 +54,6 @@ fun DetailScreen(
             title = { Text(text = title ?: "") }
         )
         // TODO: handle redirect if null
-        DetailedInfo(media = dataViewModel.detailsMediaItem!!)
+        DetailedInfo(media = media, dataViewModel = dataViewModel)
     }
 }
