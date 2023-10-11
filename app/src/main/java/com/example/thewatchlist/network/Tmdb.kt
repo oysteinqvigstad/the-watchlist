@@ -11,7 +11,6 @@ import info.movito.themoviedbapi.model.MovieDb
 import info.movito.themoviedbapi.model.Multi
 import info.movito.themoviedbapi.model.core.MovieResultsPage
 import info.movito.themoviedbapi.model.tv.TvEpisode
-import info.movito.themoviedbapi.model.tv.TvSeason
 import info.movito.themoviedbapi.model.tv.TvSeries
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -20,7 +19,7 @@ sealed interface SearchStatus {
     data class Success(val results: List<Media>): SearchStatus
     object Loading: SearchStatus
     object Error: SearchStatus
-    object Waiting: SearchStatus
+    object NoAction: SearchStatus
 }
 
 object Tmdb {

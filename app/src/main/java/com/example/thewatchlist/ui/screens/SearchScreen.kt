@@ -2,8 +2,10 @@ package com.example.thewatchlist.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -19,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.network.SearchStatus
@@ -33,13 +36,14 @@ fun SearchScreen(
 ) {
     var searchText: String? by remember { mutableStateOf(null) }
 
-    Column {
-            SearchField(searchValue = {searchText = it})
-            SearchResults(
-                dataViewModel = dataViewModel,
-                mainNavController = mainNavController,
-                searchText = searchText
-            )
+    Box {
+        SearchField(searchValue = {searchText = it})
+        SearchResults(
+            dataViewModel = dataViewModel,
+            mainNavController = mainNavController,
+            searchText = searchText
+        )
+
     }
 }
 
@@ -59,6 +63,7 @@ fun SearchField(
             searchValue(text)
             active = false
         },
+        shadowElevation = 10.dp,
         active = active,
         onActiveChange = { active = it },
         placeholder = { Text(text = "Search") },
@@ -105,11 +110,13 @@ fun SearchResults(
             dataViewModel.searchTmdb(it)
         }
     }
-    when (val res = dataViewModel.searchStatus) {
-        is SearchStatus.Success -> {
-            LazyColumn {
-                res.results.forEach {
-                    item {
+
+    LazyColumn() {
+        item { Spacer(modifier = Modifier.padding(top = 70.dp)) }
+        item {
+            when (val res = dataViewModel.searchStatus) {
+                is SearchStatus.Success -> {
+                    res.results.forEach {
                         Banner(
                             media = it,
                             activeBottomNav = MainNavOption.Search,
@@ -120,14 +127,14 @@ fun SearchResults(
                             onAdd = { dataViewModel.addMediaToList(it) }
                         )
                     }
+                }
+
+                is SearchStatus.Loading -> LoadingIndicator()
+                is SearchStatus.Error -> ErrorMessage()
+                is SearchStatus.NoAction -> {}
             }
-
-        } }
-        is SearchStatus.Loading -> LoadingIndicator()
-        is SearchStatus.Error -> ErrorMessage()
-        is SearchStatus.Waiting -> {}
+        }
     }
-
 }
 
 

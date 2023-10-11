@@ -21,7 +21,7 @@ import java.io.IOException
 
 
 class DataViewModel : ViewModel() {
-    var searchStatus: SearchStatus by mutableStateOf(SearchStatus.Waiting)
+    var searchStatus: SearchStatus by mutableStateOf(SearchStatus.NoAction)
         private set
 
     var detailsMediaItem: Media? by mutableStateOf(null)

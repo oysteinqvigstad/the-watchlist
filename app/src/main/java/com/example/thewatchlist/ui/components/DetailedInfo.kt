@@ -12,12 +12,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +31,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,6 +89,7 @@ fun DetailedTV(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailedTVSeasons(
     season: TvSeason,
@@ -89,29 +97,50 @@ fun DetailedTVSeasons(
     onCheckmark: (Boolean, TvEpisode) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val seenSeasonCount = seenList.count { it.first == season.seasonNumber }
+    val seenAll = seenSeasonCount == season.episodes.size
+    val tristate = {
+        if (seenAll) ToggleableState.On
+        else if (seenSeasonCount == 0) ToggleableState.Off
+        else ToggleableState.Indeterminate
+    }
 
-
-
-    Card {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = !expanded }
-        ) {
-
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ){
-
+    ListItem(
+        modifier = Modifier.clickable { expanded = !expanded },
+        headlineContent = {
             Text(
                 text = season.name,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(start = 8.dp, top = 2.dp, bottom = 2.dp)
-
+//                modifier = Modifier.padding(start = 8.dp, top = 2.dp, bottom = 2.dp)
             )
+        },
+        supportingContent = {
+            Column {
+                Text(text = String.format("%d episodes remaining", season.episodes.size - seenSeasonCount))
+                LinearProgressIndicator(
+                    progress = seenSeasonCount.toFloat() / season.episodes.size.toFloat(),
+                    modifier = Modifier.padding(all = 0.dp)
+                )
 
-            Spacer(modifier = Modifier.weight(1f))
+            }
+        },
+        leadingContent = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TriStateCheckbox(
+                    state = tristate(),
+                    onClick = {}
+                )
+//                Badge(
+//                    contentColor = if (seenAll) Color.Black else Color.White,
+//                    containerColor = if (seenAll) Color.Green else Color.Red
+//                ) {
+//                    Text(text = String.format("%d/%d", seenSeasonCount, season.episodes.size))
+//                }
+
+            }
+        },
+        trailingContent = {
             Icon(
                 imageVector = Icons.Default.KeyboardArrowUp,
                 contentDescription = "Collapse/Expand arrow",
@@ -120,13 +149,14 @@ fun DetailedTVSeasons(
                     .rotate(if (expanded) 0f else 180f)
             )
 
-        }
+        },
+        tonalElevation = 2.dp,
+    )
+    HorizontalDivider()
 
         if (expanded) {
             DetailedEpisodeList(season, seenList, onCheckmark)
         }
-
-    }
 
 }
 
@@ -144,12 +174,14 @@ fun DetailedEpisodeList(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = String.format("S%02dE%02d: %s", it.seasonNumber, it.episodeNumber, it.name))
                 } },
-            supportingContent = {
-                Text(text = it.overview, maxLines = 3, overflow = TextOverflow.Ellipsis)
-            },
-            trailingContent = { Checkbox(
+//            supportingContent = {
+//                Text(text = it.overview, maxLines = 3, overflow = TextOverflow.Ellipsis)
+//            },
+            leadingContent = {
+                Checkbox(
                 checked = seenList.contains(Pair(it.seasonNumber, it.episodeNumber)),
-                onCheckedChange = {state -> onCheckmark(state, it)}) }
+                onCheckedChange = {state -> onCheckmark(state, it)})
+            }
         )
     }
 
