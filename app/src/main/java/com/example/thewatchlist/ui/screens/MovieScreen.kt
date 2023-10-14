@@ -43,7 +43,9 @@ fun MovieScreen(
                         dataViewModel.setActiveDetailsMediaItem(it)
                         mainNavController.navigate("details")
                     },
-                    onAdd = {}
+                    onAdd = { dataViewModel.addMediaToList(it) },
+                    dataViewModel = dataViewModel
+
                 )
         } }
 

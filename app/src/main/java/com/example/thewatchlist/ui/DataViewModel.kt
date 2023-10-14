@@ -1,5 +1,6 @@
 package com.example.thewatchlist.ui
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -10,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.thewatchlist.data.media.Media
 import com.example.thewatchlist.data.media.Movie
 import com.example.thewatchlist.data.media.TV
+import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.network.SearchStatus
 import com.example.thewatchlist.network.Tmdb
 import info.movito.themoviedbapi.model.MovieDb
@@ -58,9 +60,23 @@ class DataViewModel : ViewModel() {
 
 
     fun addMediaToList(media: Media) {
-        if (mediaList.find { media.id == it.id } == null) {
-            mediaList += media
+        val existingMedia = mediaList.find { media.id == it.id }
+        if (existingMedia != null) {
+            existingMedia.status = TopNavOption.ToWatch
+            updateMediaEntry(existingMedia)
+        } else {
+            media.status = TopNavOption.ToWatch
+            mediaList.add(media)
         }
+    }
+
+    fun removeMediaFromList(media: Media) {
+        mediaList.remove(media)
+    }
+
+    fun moveToHistory(media: Media) {
+        media.status = TopNavOption.History
+        updateMediaEntry(media)
     }
 
     fun setEpisodeCheckmark(checked: Boolean, episode: TvEpisode, tv: TV) {
@@ -71,9 +87,6 @@ class DataViewModel : ViewModel() {
             tv.seenList.remove(seenEntry)
         }
         updateMediaEntry(tv)
-
-
-
     }
 
     fun updateMediaEntry(media: Media) {
@@ -89,4 +102,9 @@ class DataViewModel : ViewModel() {
     fun setActiveDetailsMediaItem(media: Media) {
         detailsMediaItem = media
     }
+
+    fun isInWatchlist(media: Media): Boolean {
+        return mediaList.find { media.id == it.id && it.status != TopNavOption.History } != null
+    }
+
 }

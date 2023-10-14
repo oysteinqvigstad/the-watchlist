@@ -111,7 +111,7 @@ fun SearchResults(
         }
     }
 
-    LazyColumn() {
+    LazyColumn {
         item { Spacer(modifier = Modifier.padding(top = 70.dp)) }
         item {
             when (val res = dataViewModel.searchStatus) {
@@ -124,7 +124,9 @@ fun SearchResults(
                                 dataViewModel.setActiveDetailsMediaItem(it)
                                 mainNavController.navigate("details")
                             },
-                            onAdd = { dataViewModel.addMediaToList(it) }
+                            onAdd = { dataViewModel.addMediaToList(it) },
+                            dataViewModel = dataViewModel
+
                         )
                     }
                 }

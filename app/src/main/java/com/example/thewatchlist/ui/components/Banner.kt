@@ -2,16 +2,13 @@ package com.example.thewatchlist.ui.components
 
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -20,9 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,27 +27,28 @@ import com.example.thewatchlist.data.media.Media
 import com.example.thewatchlist.data.media.Movie
 import com.example.thewatchlist.data.media.TV
 import com.example.thewatchlist.data.navigation.MainNavOption
+import com.example.thewatchlist.ui.DataViewModel
 import info.movito.themoviedbapi.model.Genre
 
 
 @Composable
 fun Banner(
     media: Media,
+    dataViewModel: DataViewModel,
     activeBottomNav: MainNavOption,
     onDetails: (Media) -> Unit,
-    onAdd: (Media) -> Unit
+    onAdd: (Media) -> Unit,
 ) {
 
     when (media) {
         is Movie -> MovieBannerTest(
             movie = media,
+            dataViewModel = dataViewModel,
             activeBottomNav = activeBottomNav,
-            onAdd = onAdd,
-            onDetails = onDetails
+            onDetails = onDetails,
         )
         is TV -> TVBanner(
             tv = media,
-            activeBottomNav = activeBottomNav,
             onAdd = onAdd,
             onDetails = onDetails
         )
@@ -62,7 +58,6 @@ fun Banner(
 @Composable
 fun TVBanner(
     tv: TV,
-    activeBottomNav: MainNavOption,
     onAdd: (Media) -> Unit,
     onDetails: (Media) -> Unit
 ) {
@@ -74,32 +69,14 @@ fun TVBanner(
 }
 
 
-@Composable
-fun MovieBanner(
-    movie: Movie,
-    activeBottomNav: MainNavOption,
-    onAdd: (Media) -> Unit,
-    onDetails: (Media) -> Unit
-) {
-    Row {
-        Box(modifier = Modifier
-            .size(60.dp)
-            .clip(RectangleShape)
-            .background(Color.Blue))
-        Text(text = "Movie: " + movie.tmdb.title, modifier = Modifier.clickable { onDetails(movie) })
-        Spacer(modifier = Modifier.padding(start = 2.dp))
-        Text(text = "+", modifier = Modifier.clickable { onAdd(movie) })
-    }
 
-
-}
 
 @Composable
 fun MovieBannerTest(
     movie: Movie,
+    dataViewModel: DataViewModel,
     activeBottomNav: MainNavOption,
-    onAdd: (Media) -> Unit,
-    onDetails: (Media) -> Unit
+    onDetails: (Media) -> Unit,
 ) {
     Card(modifier = Modifier.padding(4.dp)) {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -127,23 +104,33 @@ fun MovieBannerTest(
                 Text(text = getThreeGenres(movie.tmdb.genres), fontSize = 12.sp,
                     modifier = Modifier.padding(bottom = 15.dp, start = 10.dp))
 
-                Button(
-                    onClick = { onAdd(movie) },
-                    colors = ButtonDefaults.buttonColors(Color(65, 106, 145)),
-                    modifier = Modifier
-                        .height(35.dp)
-                        .padding(start = 20.dp)
-                ) {
-
-                    Text(
-                        text = "Add to watchlist",
-                        fontSize = 13.sp
-                    )
-                }
-
+                BannerPrimaryActionButton(media = movie, dataViewModel = dataViewModel, activeNavOption = activeBottomNav)
             }
         }
 
+    }
+}
+
+@Composable
+fun BannerPrimaryActionButton(
+    media: Media,
+    activeNavOption: MainNavOption,
+    dataViewModel: DataViewModel
+) {
+    val contents = media.getPrimaryAction(activeNavOption = activeNavOption, dataViewModel = dataViewModel)
+
+
+    Button(
+        onClick = { contents.action(media) },
+        colors = ButtonDefaults.buttonColors(contents.color),
+        modifier = Modifier
+            .height(35.dp)
+            .padding(start = 20.dp)
+    ) {
+        Text(
+            text = contents.label,
+            fontSize = 13.sp
+        )
     }
 }
 
