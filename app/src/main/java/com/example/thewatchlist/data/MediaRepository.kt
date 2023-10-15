@@ -1,5 +1,6 @@
 package com.example.thewatchlist.data
 
+import android.util.Log
 import info.movito.themoviedbapi.TmdbApi
 import info.movito.themoviedbapi.model.MovieDb
 import info.movito.themoviedbapi.model.Multi
@@ -11,6 +12,7 @@ import kotlinx.coroutines.withContext
 interface MediaRepository {
     suspend fun getMultiMedia(title: String): List<Media>?
     suspend fun getEpisodes(seriesId: Int, seasonId: Int): List<TvEpisode>?
+    suspend fun getEpisodesNew(seriesId: Int, seasonId: Int): List<Episode>?
 }
 
 class NetworkMediaRepository(thunk: () -> TmdbApi) : MediaRepository {
@@ -51,6 +53,16 @@ class NetworkMediaRepository(thunk: () -> TmdbApi) : MediaRepository {
     }
 
 
+    override suspend fun getEpisodesNew(seriesId: Int, seasonId: Int): List<Episode>? {
+        return withContext(Dispatchers.IO) {
+            try {
+                api.tvSeasons.getSeason(seriesId, seasonId, "en").episodes.map { Episode(it) }
+            } catch (e: Exception) {
+                Log.d("me", "something wrong?")
+                null
+            }
+        }
+    }
 
 
 

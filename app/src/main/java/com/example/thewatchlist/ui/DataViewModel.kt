@@ -1,5 +1,6 @@
 package com.example.thewatchlist.ui
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -12,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.thewatchlist.WatchlistApplication
+import com.example.thewatchlist.data.Episode
 import com.example.thewatchlist.data.MediaRepository
 import com.example.thewatchlist.data.Media
 import com.example.thewatchlist.data.Movie
@@ -20,6 +22,7 @@ import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.network.SearchStatus
 import info.movito.themoviedbapi.model.tv.TvEpisode
 import kotlinx.coroutines.launch
+import org.apache.commons.lang3.ObjectUtils.Null
 import java.io.IOException
 
 
@@ -104,6 +107,27 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
 
     }
 
+
+    suspend fun updateEpisodesNew(tv: TV) {
+        try {
+            tv.seasonsNew = tv.seasonsNew.map { season ->
+                Log.d("me", tv.id.toString() + " " + season.seasonNumber)
+                mediaRepository.getEpisodesNew(tv.id, season.seasonNumber)!!.let { episodes ->
+                    Log.d("me", "here?")
+                    Log.d("me", "hentet episoder:" + episodes.size)
+                    season.copy(episodes = episodes.map { episode ->
+                        season.episodes.find { episode.episodeNumber == it.episodeNumber } ?: episode
+                    }.sortedBy { it.episodeNumber })
+                }
+            }
+            updateMediaEntry(tv)
+        } catch (e: Exception) {
+            Log.d("me", "Ooops")
+
+        }
+
+
+    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

@@ -95,7 +95,9 @@ fun MainNavController(
             composable("details") {
                 DetailScreen(
                     navController = navController,
-                    dataViewModel = dataViewModel
+                    dataViewModel = dataViewModel,
+                    // TODO: Handle this null case
+                    media = dataViewModel.detailsMediaItem!!
                 )
             }
         }

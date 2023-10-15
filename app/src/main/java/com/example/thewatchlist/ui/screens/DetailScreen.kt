@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
+import com.example.thewatchlist.data.Media
 import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.ui.DataViewModel
@@ -22,21 +23,14 @@ import com.example.thewatchlist.ui.components.DetailedInfo
 @Composable
 fun DetailScreen(
     navController: NavController,
-    dataViewModel: DataViewModel
+    dataViewModel: DataViewModel,
+    media: Media
 ) {
-    // TODO: Handle redirection if null
-    val media = dataViewModel.detailsMediaItem!!
-    val title = media.let {
-        when (it) {
-            is Movie -> (it as Movie).title
-            is TV -> (it as TV).title
-            else -> ""
-        }
-    }
 
     LaunchedEffect(Unit) {
         if (media is TV) {
-            dataViewModel.updateEpisodes(media)
+//            dataViewModel.updateEpisodes(media)
+            dataViewModel.updateEpisodesNew(media)
         }
     }
 
@@ -51,7 +45,7 @@ fun DetailScreen(
                     Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
                 }
             },
-            title = { Text(text = title ?: "") }
+            title = { Text(text = media.title) }
         )
         // TODO: handle redirect if null
         DetailedInfo(media = media, dataViewModel = dataViewModel)

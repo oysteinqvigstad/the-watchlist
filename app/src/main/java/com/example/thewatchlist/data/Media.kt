@@ -3,6 +3,7 @@ package com.example.thewatchlist.data
 import com.example.thewatchlist.data.navigation.TopNavOption
 import info.movito.themoviedbapi.model.Genre
 import info.movito.themoviedbapi.model.MovieDb
+import info.movito.themoviedbapi.model.tv.TvEpisode
 import info.movito.themoviedbapi.model.tv.TvSeason
 import info.movito.themoviedbapi.model.tv.TvSeries
 import java.util.Date
@@ -60,7 +61,12 @@ data class TV (
         releaseYear = tmdb.firstAirDate.split("-")[0].toIntOrNull() ?: 0,
         runtime = Pair(tmdb.episodeRuntime.getOrElse(0) { 0 } / 60, tmdb.episodeRuntime.getOrElse(0) { 0 } % 60),
         seasons = tmdb.seasons,
-        seasonsNew = tmdb.seasons.map { Season(id = it.id, seasonNumber = it.seasonNumber, episodes = listOf()) }
+        seasonsNew = tmdb.seasons.map { Season(
+            id = it.id,
+            seasonNumber = it.seasonNumber,
+            episodes = listOf(),
+            title = it.name
+        ) }
     )
     init {
         seasons.forEach { if (it.episodes == null) it.episodes = listOf() }
@@ -70,17 +76,27 @@ data class TV (
 
 data class Season (
     val id: Int,
+    val title: String,
     val seasonNumber: Int,
-    val episodes: List<Episode>
+    var episodes: List<Episode>
 )
 
 data class Episode (
     val id: Int,
     val episodeNumber: Int,
     val seasonNumber: Int,
-    val airDate: Date,
-    val name: String,
+    val airDate: String,
+    val title: String,
     val overview: String,
     var seen: Boolean
-
-)
+) {
+    constructor(tmdb: TvEpisode) : this(
+        id = tmdb.id,
+        episodeNumber = tmdb.episodeNumber,
+        seasonNumber = tmdb.seasonNumber,
+        airDate = tmdb.airDate ?: "",
+        title = tmdb.name,
+        overview = tmdb.overview,
+        seen = false
+    )
+}

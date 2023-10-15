@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.thewatchlist.data.Media
 import com.example.thewatchlist.data.Movie
+import com.example.thewatchlist.data.Season
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.ui.DataViewModel
 import info.movito.themoviedbapi.model.tv.TvEpisode
@@ -70,32 +71,34 @@ fun DetailedTV(
     onCheckmark: (Boolean, TvEpisode) -> Unit
 ) {
 
-    LaunchedEffect(Unit) {
-        // This updates way too often!!
-
-    }
 
     LazyColumn {
         item { Text(text = tv.title) }
-//        item { Text(text = tv.) }
-//        item { Text(text = tv.tmdb) }
         item { Text(text = tv.overview) }
-        tv.seasons.forEach {
-            item { DetailedTVSeasons(it, tv.seenList, onCheckmark) }
+        tv.seasonsNew.forEach {
+//            item { DetailedTVSeasons(it, tv.seenList, onCheckmark) }
+            item { DetailedTVSeasons(tv = tv, season = it) }
         }
     }
 }
+
+@Composable
+fun DetailedTVSeasonNew(tv: TV, season: Season) {
+    Text(text = season.seasonNumber.toString() + ": "+ season.episodes.size.toString())
+
+}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailedTVSeasons(
-    season: TvSeason,
-    seenList: MutableSet<Pair<Int, Int>>,
-    onCheckmark: (Boolean, TvEpisode) -> Unit
+    tv: TV,
+    season: Season,
+//    onCheckmark: (Boolean, TvEpisode) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val seenSeasonCount = seenList.count { it.first == season.seasonNumber }
+    val seenSeasonCount = season.episodes.count { it.seen }
     val seenAll = seenSeasonCount == season.episodes.size
     val tristate = {
         if (seenAll) ToggleableState.On
@@ -107,7 +110,7 @@ fun DetailedTVSeasons(
         modifier = Modifier.clickable { expanded = !expanded },
         headlineContent = {
             Text(
-                text = season.name,
+                text = season.title,
 //                modifier = Modifier.padding(start = 8.dp, top = 2.dp, bottom = 2.dp)
             )
         },
@@ -152,33 +155,35 @@ fun DetailedTVSeasons(
     )
     HorizontalDivider()
 
-        if (expanded) {
-            DetailedEpisodeList(season, seenList, onCheckmark)
-        }
+    if (expanded) {
+        DetailedEpisodeList(tv, season)
+    }
 
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailedEpisodeList(
-    season: TvSeason,
-    seenList: MutableSet<Pair<Int, Int>>,
-    onCheckmark: (Boolean, TvEpisode) -> Unit) {
+    tv: TV,
+    season: Season,
+//    seenList: MutableSet<Pair<Int, Int>>,
+//    onCheckmark: (Boolean, TvEpisode) -> Unit)
+) {
 
 
     season.episodes.forEach {
         ListItem(
             headlineContent = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = String.format("S%02dE%02d: %s", it.seasonNumber, it.episodeNumber, it.name))
+                    Text(text = String.format("S%02dE%02d: %s", it.seasonNumber, it.episodeNumber, it.title))
                 } },
 //            supportingContent = {
 //                Text(text = it.overview, maxLines = 3, overflow = TextOverflow.Ellipsis)
 //            },
             leadingContent = {
                 Checkbox(
-                checked = seenList.contains(Pair(it.seasonNumber, it.episodeNumber)),
-                onCheckedChange = {state -> onCheckmark(state, it)})
+                    checked = it.seen,
+                    onCheckedChange = { /* state -> onCheckmark(state, it) */ })
             }
         )
     }
