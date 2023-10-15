@@ -1,5 +1,5 @@
 package com.example.thewatchlist.data.media
-
+/*
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.network.Tmdb
 import com.example.thewatchlist.ui.DataViewModel
@@ -46,10 +46,11 @@ class TV(
 
 
 
-    public override fun clone(): TV {
+    override fun clone(): TV {
         return super<Media>.clone() as TV
     }
 
+    /*
     override fun getPrimaryAction(
         activeNavOption: MainNavOption,
         dataViewModel: DataViewModel
@@ -63,20 +64,23 @@ class TV(
     }
 
 
+// TODO: re
+//    suspend fun updateEpisodes() {
+//        try {
+//            seasons.forEach { season ->
+//                Tmdb.getEpisodes(this.id, season.seasonNumber)?.let { episodes ->
+//                    if (episodes.isNotEmpty()) {
+//                        season.episodes = episodes
+//                    }
+//                }
+//            }
+//        } catch (e: Exception) {
+//            throw e
+//        }
+//
+//    }
 
-    suspend fun updateEpisodes() {
-        try {
-            seasons.forEach { season ->
-                Tmdb.getEpisodes(this.id, season.seasonNumber)?.let { episodes ->
-                    if (episodes.isNotEmpty()) {
-                        season.episodes = episodes
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            throw e
-        }
 
-    }
-
+     */
 }
+*/

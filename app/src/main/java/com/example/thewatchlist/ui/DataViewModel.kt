@@ -13,10 +13,13 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.thewatchlist.WatchlistApplication
 import com.example.thewatchlist.data.MediaRepository
+import com.example.thewatchlist.data.media.Button
 import com.example.thewatchlist.data.media.Media
+import com.example.thewatchlist.data.media.Movie
 import com.example.thewatchlist.data.media.TV
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.network.SearchStatus
+import com.example.thewatchlist.ui.theme.RemoveColor
 import info.movito.themoviedbapi.model.tv.TvEpisode
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -48,31 +51,12 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
     }
 
     suspend fun updateEpisodes(tv: TV) {
-        viewModelScope.async { tv.updateEpisodes() }.await()
-        updateMediaEntry(tv)
+        // TODO: Reimplement
+//        viewModelScope.async { tv.updateEpisodes() }.await()
+//        updateMediaEntry(tv)
 
     }
 
-
-    fun addMediaToList(media: Media) {
-        val existingMedia = mediaList.find { media.id == it.id }
-        if (existingMedia != null) {
-            existingMedia.status = TopNavOption.ToWatch
-            updateMediaEntry(existingMedia)
-        } else {
-            media.status = TopNavOption.ToWatch
-            mediaList.add(media)
-        }
-    }
-
-    fun removeMediaFromList(media: Media) {
-        mediaList.remove(media)
-    }
-
-    fun moveToHistory(media: Media) {
-        media.status = TopNavOption.History
-        updateMediaEntry(media)
-    }
 
     fun setEpisodeCheckmark(checked: Boolean, episode: TvEpisode, tv: TV) {
         val seenEntry = Pair(episode.seasonNumber, episode.episodeNumber)
@@ -84,13 +68,18 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
         updateMediaEntry(tv)
     }
 
-    fun updateMediaEntry(media: Media) {
+    private fun updateMediaEntry(media: Media) {
+        val clonedMedia = when (media) {
+            is TV -> media.copy()
+            is Movie -> media.copy()
+            else -> media
+        }
         val index = mediaList.indexOf(media)
         if (index >= 0) {
-            mediaList[index] = media.clone()
+            mediaList[index] = clonedMedia
         }
         if (detailsMediaItem?.id == media.id) {
-            detailsMediaItem = media.clone()
+            detailsMediaItem = clonedMedia
         }
     }
 
@@ -101,6 +90,15 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
     fun isInWatchlist(media: Media): Boolean {
         return mediaList.find { media.id == it.id && it.status != TopNavOption.History } != null
     }
+
+    fun moveMediaTo(media: Media, tab: TopNavOption?) {
+        mediaList.remove(media)
+        if (tab != null) {
+            media.status = tab
+            mediaList.add(media)
+        }
+    }
+
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

@@ -42,7 +42,6 @@ fun ShowScreen(
                         dataViewModel.setActiveDetailsMediaItem(it)
                         mainNavController.navigate("details")
                     },
-                    onAdd = { dataViewModel.addMediaToList(it) },
                     dataViewModel = dataViewModel
                 )
             }

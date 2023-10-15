@@ -27,8 +27,10 @@ import com.example.thewatchlist.data.media.Media
 import com.example.thewatchlist.data.media.Movie
 import com.example.thewatchlist.data.media.TV
 import com.example.thewatchlist.data.navigation.MainNavOption
+import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.ui.DataViewModel
-import info.movito.themoviedbapi.model.Genre
+import com.example.thewatchlist.ui.theme.KashmirBlue
+import com.example.thewatchlist.ui.theme.RemoveColor
 
 
 @Composable
@@ -37,7 +39,6 @@ fun Banner(
     dataViewModel: DataViewModel,
     activeBottomNav: MainNavOption,
     onDetails: (Media) -> Unit,
-    onAdd: (Media) -> Unit,
 ) {
 
     when (media) {
@@ -49,7 +50,7 @@ fun Banner(
         )
         is TV -> TVBanner(
             tv = media,
-            onAdd = onAdd,
+            dataViewModel = dataViewModel,
             onDetails = onDetails
         )
     }
@@ -58,13 +59,13 @@ fun Banner(
 @Composable
 fun TVBanner(
     tv: TV,
-    onAdd: (Media) -> Unit,
+    dataViewModel: DataViewModel,
     onDetails: (Media) -> Unit
 ) {
     Row {
         Text(text = "TV: " + tv.title, modifier = Modifier.clickable { onDetails(tv) })
         Spacer(modifier = Modifier.padding(start = 2.dp))
-        Text(text = "+", modifier = Modifier.clickable { onAdd(tv) })
+        Text(text = "+", modifier = Modifier.clickable { dataViewModel.moveMediaTo(tv, TopNavOption.ToWatch) })
     }
 }
 
@@ -106,35 +107,13 @@ fun MovieBannerTest(
                     fontSize = 12.sp,
                     modifier = Modifier.padding(bottom = 15.dp, start = 10.dp))
 
-                BannerPrimaryActionButton(media = movie, dataViewModel = dataViewModel, activeNavOption = activeBottomNav)
+                BannerPrimaryAction(media = movie, activeBottomNav = activeBottomNav, dataViewModel = dataViewModel)
             }
         }
 
     }
 }
 
-@Composable
-fun BannerPrimaryActionButton(
-    media: Media,
-    activeNavOption: MainNavOption,
-    dataViewModel: DataViewModel
-) {
-    val contents = media.getPrimaryAction(activeNavOption = activeNavOption, dataViewModel = dataViewModel)
-
-
-    Button(
-        onClick = { contents.action(media) },
-        colors = ButtonDefaults.buttonColors(contents.color),
-        modifier = Modifier
-            .height(35.dp)
-            .padding(start = 20.dp)
-    ) {
-        Text(
-            text = contents.label,
-            fontSize = 13.sp
-        )
-    }
-}
 
 
 
@@ -183,5 +162,39 @@ fun PreviewMovie() {
             }
         }
 
+    }
+}
+
+@Composable
+fun BannerPrimaryAction(media: Media, dataViewModel: DataViewModel, activeBottomNav: MainNavOption) {
+    if (activeBottomNav == MainNavOption.Search) {
+        if (dataViewModel.isInWatchlist(media)) {
+            BannerActionButton(media = media, label = "Remove from Watchlist", action = { dataViewModel.moveMediaTo(it, null) }, color = RemoveColor)
+        } else {
+            BannerActionButton(media = media, label = "Add to Watchlist", action = { dataViewModel.moveMediaTo(it, TopNavOption.ToWatch) }, color = KashmirBlue)
+        }
+    } else if (media.status == TopNavOption.History) {
+        BannerActionButton(media = media, label = "Remove from Watchlist", action = { dataViewModel.moveMediaTo(it, null) }, color = RemoveColor)
+    } else if (media is TV && media.status == TopNavOption.ToWatch) {
+        BannerActionButton(media = media, label = "Start Watching", action = { dataViewModel.moveMediaTo(it, TopNavOption.Watching) }, color = KashmirBlue)
+    } else {
+        BannerActionButton(media = media, label = "Move to History", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, color = RemoveColor)
+    }
+}
+
+
+@Composable
+fun BannerActionButton(media: Media, label: String, action: (Media) -> Unit, color: Color) {
+    Button(
+        onClick = { action(media) },
+        colors = ButtonDefaults.buttonColors(color),
+        modifier = Modifier
+            .height(35.dp)
+            .padding(start = 20.dp)
+    ) {
+        Text(
+            text = label,
+            fontSize = 13.sp
+        )
     }
 }

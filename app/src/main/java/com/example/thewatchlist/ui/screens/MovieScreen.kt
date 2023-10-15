@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.example.thewatchlist.data.media.Movie
 import com.example.thewatchlist.data.navigation.MainNavOption
+import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.MainNavState
 import com.example.thewatchlist.ui.TabNavigation
@@ -43,7 +44,6 @@ fun MovieScreen(
                         dataViewModel.setActiveDetailsMediaItem(it)
                         mainNavController.navigate("details")
                     },
-                    onAdd = { dataViewModel.addMediaToList(it) },
                     dataViewModel = dataViewModel
 
                 )

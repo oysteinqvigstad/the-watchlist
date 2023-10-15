@@ -1,5 +1,5 @@
 package com.example.thewatchlist.data.media
-
+/*
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.ui.DataViewModel
@@ -22,7 +22,7 @@ class Movie(
     releaseYear = releaseYear
 ), Cloneable {
 
-    public override fun clone(): Movie {
+    override fun clone(): Movie {
         return super<Media>.clone() as Movie
     }
 
@@ -37,8 +37,8 @@ class Movie(
 
     )
 
-
-
+// TODO: reimplement
+/*
     override fun getPrimaryAction(
         activeNavOption: MainNavOption,
         dataViewModel: DataViewModel
@@ -61,5 +61,7 @@ class Movie(
             }
         }
     }
-
+*/
 }
+
+ */

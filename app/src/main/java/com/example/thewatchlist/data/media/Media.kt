@@ -1,5 +1,5 @@
 package com.example.thewatchlist.data.media
-
+/*
 import androidx.compose.ui.graphics.Color
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
@@ -28,7 +28,8 @@ open class Media(
     public override fun clone(): Media {
         return super.clone() as Media
     }
-
+    // TODO: reimplement
+/*
     open fun getPrimaryAction(
         activeNavOption: MainNavOption,
         dataViewModel: DataViewModel
@@ -45,4 +46,8 @@ open class Media(
                 color = KashmirBlue)
         }
     }
+
+ */
 }
+
+ */
