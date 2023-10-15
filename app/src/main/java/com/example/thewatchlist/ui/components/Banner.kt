@@ -62,7 +62,7 @@ fun TVBanner(
     onDetails: (Media) -> Unit
 ) {
     Row {
-        Text(text = "TV: " + tv.tmdb.name, modifier = Modifier.clickable { onDetails(tv) })
+        Text(text = "TV: " + tv.title, modifier = Modifier.clickable { onDetails(tv) })
         Spacer(modifier = Modifier.padding(start = 2.dp))
         Text(text = "+", modifier = Modifier.clickable { onAdd(tv) })
     }
@@ -92,16 +92,18 @@ fun MovieBannerTest(
             Column(modifier = Modifier.align(Alignment.CenterVertically)) {
 
                 Text(
-                    text = movie.tmdb.title + getReleaseYear(movie.tmdb.releaseDate),
+                    text = movie.title + "(" + movie.releaseYear.toString() + ")",
                     fontSize = 20.sp,
                     modifier = Modifier
                         .clickable { onDetails(movie) }
                         .padding(bottom = 5.dp))
 
-                Text(text = getMovieLength(movie.tmdb.runtime), fontSize = 12.sp,
+                Text(text = formatMovieLength(movie.runtime),
+                    fontSize = 12.sp,
                     modifier = Modifier.padding(bottom = 5.dp, start = 10.dp))
 
-                Text(text = getThreeGenres(movie.tmdb.genres), fontSize = 12.sp,
+                Text(text = movie.genres.take(3).joinToString(", ") { it.name },
+                    fontSize = 12.sp,
                     modifier = Modifier.padding(bottom = 15.dp, start = 10.dp))
 
                 BannerPrimaryActionButton(media = movie, dataViewModel = dataViewModel, activeNavOption = activeBottomNav)
@@ -135,35 +137,14 @@ fun BannerPrimaryActionButton(
 }
 
 
-fun getReleaseYear(date: String): String {
- return " (" + date.split("-")[0] + ")"
-}
 
-fun getMovieLength(min: Int): String {
-    val hour = min/60
-    val minute = (min%60).toString()
-
-    if (hour === 0) {
-        return minute + "min"
+fun formatMovieLength(time: Pair<Int, Int>): String {
+    if (time.first == 0) {
+        return time.second.toString() + "min"
     }
-
-  return hour.toString() + "." + minute + "h"
+    return time.first.toString() + "." + time.second + "h"
 }
 
-fun getThreeGenres(genres: List<Genre>): String {
-    var s = ""
-    var genre: String
-    var max = 0
-
-    while (max < 3 && max < genres.size) {
-
-        genre = genres[max].toString().split("[")[0].trim()
-        s += "$genre, "
-        max++
-    }
-
-    return s.trim().trim(',')
-}
 
 @Preview(showBackground = true)
 @Composable

@@ -93,7 +93,6 @@ object Tmdb {
     suspend fun getEpisodes(seriesId: Int, seasonId: Int): List<TvEpisode>? {
         return withContext(Dispatchers.IO) {
             try {
-                Log.d("me", "hello?")
                 tmdbTvSeasons.getSeason(seriesId, seasonId, "en").episodes
             } catch (e: Exception) {
                 null

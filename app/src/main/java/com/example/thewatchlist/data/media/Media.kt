@@ -1,13 +1,12 @@
 package com.example.thewatchlist.data.media
 
-import android.util.Log
-import androidx.compose.material3.ButtonColors
 import androidx.compose.ui.graphics.Color
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.theme.KashmirBlue
 import com.example.thewatchlist.ui.theme.RemoveColor
+import info.movito.themoviedbapi.model.Genre
 
 data class Button(
     val label: String,
@@ -16,7 +15,14 @@ data class Button(
 )
 
 
-open class Media(val id: Int) : Cloneable {
+open class Media(
+    val id: Int,
+    val title: String,
+    val overview: String,
+    val genres: List<Genre>,
+    val releaseYear: Int
+) : Cloneable {
+
     var status = TopNavOption.ToWatch
 
     public override fun clone(): Media {

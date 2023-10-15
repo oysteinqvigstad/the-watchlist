@@ -1,28 +1,29 @@
 package com.example.thewatchlist.ui
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.thewatchlist.WatchlistApplication
+import com.example.thewatchlist.data.MediaRepository
 import com.example.thewatchlist.data.media.Media
-import com.example.thewatchlist.data.media.Movie
 import com.example.thewatchlist.data.media.TV
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.network.SearchStatus
-import com.example.thewatchlist.network.Tmdb
-import info.movito.themoviedbapi.model.MovieDb
 import info.movito.themoviedbapi.model.tv.TvEpisode
-import info.movito.themoviedbapi.model.tv.TvSeries
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 
-class DataViewModel : ViewModel() {
+class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() {
     var searchStatus: SearchStatus by mutableStateOf(SearchStatus.NoAction)
         private set
 
@@ -36,13 +37,7 @@ class DataViewModel : ViewModel() {
         searchStatus = SearchStatus.Loading
         viewModelScope.launch {
             searchStatus = try {
-                val results = Tmdb.searchMulti(title)?.mapNotNull {
-                    when (it) {
-                        is MovieDb -> Movie(it)
-                        is TvSeries -> TV(it)
-                        else -> null
-                    }
-                }
+                val results = mediaRepository.getMultiMedia(title)
                 SearchStatus.Success(results = results!!)
             } catch (e: IOException) {
                 SearchStatus.Error
@@ -105,6 +100,16 @@ class DataViewModel : ViewModel() {
 
     fun isInWatchlist(media: Media): Boolean {
         return mediaList.find { media.id == it.id && it.status != TopNavOption.History } != null
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as WatchlistApplication)
+                val mediaRepository = application.container.mediaRepository
+                DataViewModel(mediaRepository)
+            }
+        }
     }
 
 }

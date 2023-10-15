@@ -5,22 +5,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Badge
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
@@ -31,9 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.state.ToggleableState
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.thewatchlist.data.media.Media
@@ -64,10 +57,10 @@ fun DetailedInfo(
 fun DetailedMovie(
     movie: Movie
 ) {
-    Text(text = movie.tmdb.title)
-    Text(text = movie.tmdb.releaseDate)
-    Text(text = movie.tmdb.runtime.toString())
-    Text(text = movie.tmdb.overview)
+    Text(text = movie.title)
+    Text(text = movie.releaseYear.toString())
+    Text(text = formatMovieLength(movie.runtime))
+    Text(text = movie.overview)
 }
 
 @Composable
@@ -78,13 +71,13 @@ fun DetailedTV(
 
 
     LazyColumn {
-        item { Text(text = tv.tmdb.name) }
-        item { Text(text = tv.tmdb.firstAirDate) }
-        item { Text(text = tv.tmdb.episodeRuntime.toString()) }
-        item { Text(text = tv.tmdb.overview) }
-        tv.tmdb.seasons.forEach {
-            item { DetailedTVSeasons(it, tv.seenList, onCheckmark) }
-        }
+        item { Text(text = tv.title) }
+//        item { Text(text = tv.) }
+//        item { Text(text = tv.tmdb.episodeRuntime.toString()) }
+        item { Text(text = tv.overview) }
+//        tv.tmdb.seasons.forEach {
+//            item { DetailedTVSeasons(it, tv.seenList, onCheckmark) }
+//        }
     }
 }
 
