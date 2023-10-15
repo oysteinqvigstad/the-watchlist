@@ -28,8 +28,8 @@ fun DetailScreen(
     val media = dataViewModel.detailsMediaItem!!
     val title = media.let {
         when (it) {
-            is Movie -> (it as Movie).tmdb.title
-            is TV -> (it as TV).tmdb.name
+            is Movie -> (it as Movie).title
+            is TV -> (it as TV).title
             else -> ""
         }
     }

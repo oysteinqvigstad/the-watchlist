@@ -33,7 +33,7 @@ import com.example.thewatchlist.ui.theme.KashmirBlue
 fun MainNavController(
     navController: NavHostController = rememberNavController(),
     mainNavState: MainNavState = viewModel(),
-    dataViewModel: DataViewModel = viewModel()
+    dataViewModel: DataViewModel = viewModel(factory = DataViewModel.Factory)
 ) {
     val activeMenuItem = mainNavState.activeMainNavItem
 
@@ -109,7 +109,7 @@ fun TabNavigation(
     topNavItems: List<TopNavOption>,
     onClick: (TopNavOption) -> Unit = {}
 ) {
-    TabRow(
+    SecondaryTabRow(
         selectedTabIndex = topNavItems.indexOf(activeTopNavOption),
         contentColor = KashmirBlue
 

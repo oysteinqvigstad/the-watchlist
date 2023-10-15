@@ -1,20 +1,43 @@
 package com.example.thewatchlist.data.media
 
-import android.util.Log
-import com.example.thewatchlist.data.navigation.MainNavItem
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.ui.DataViewModel
-import com.example.thewatchlist.ui.MainNavState
-import com.example.thewatchlist.ui.theme.KashmirBlue
 import com.example.thewatchlist.ui.theme.RemoveColor
+import info.movito.themoviedbapi.model.Genre
 import info.movito.themoviedbapi.model.MovieDb
 
-class Movie(var tmdb: MovieDb) : Media(id = tmdb.id) {
+class Movie(
+    id: Int,
+    title: String,
+    overview: String,
+    genres: List<Genre>,
+    releaseYear: Int,
+    val runtime: Pair<Int, Int>,
+) : Media(
+    id = id,
+    title = title,
+    overview = overview,
+    genres = genres,
+    releaseYear = releaseYear
+), Cloneable {
 
     public override fun clone(): Movie {
-        return super.clone() as Movie
+        return super<Media>.clone() as Movie
     }
+
+
+    constructor(tmdb: MovieDb) : this(
+        id = tmdb.id,
+        title = tmdb.title,
+        overview = tmdb.overview,
+        genres = tmdb.genres,
+        releaseYear = tmdb.releaseDate.split("-")[0].toIntOrNull() ?: 0,
+        runtime = Pair(tmdb.runtime / 60, tmdb.runtime % 60)
+
+    )
+
+
 
     override fun getPrimaryAction(
         activeNavOption: MainNavOption,
