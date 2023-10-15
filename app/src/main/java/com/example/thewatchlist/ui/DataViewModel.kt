@@ -50,28 +50,27 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
         }
     }
 
-    fun setEpisodeCheckmark(checked: Boolean, episode: TvEpisode, tv: TV) {
-        val seenEntry = Pair(episode.seasonNumber, episode.episodeNumber)
-        if (checked) {
-            tv.seenList.add(seenEntry)
-        } else {
-            tv.seenList.remove(seenEntry)
-        }
+    fun setEpisodeCheckmark(checked: Boolean, tv: TV, episode: Episode) {
+        val tv = tv.copy(seasonsNew = tv.seasonsNew.map { season ->
+            season.copy(episodes = season.episodes.map { ep ->
+                if (ep == episode) episode.copy(seen = checked) else ep
+            })
+        })
         updateMediaEntry(tv)
     }
 
     private fun updateMediaEntry(media: Media) {
-        val clonedMedia = when (media) {
-            is TV -> media.copy()
-            is Movie -> media.copy()
-            else -> media
-        }
-        val index = mediaList.indexOf(media)
+//        val clonedMedia = when (media) {
+//            is TV -> media.copy()
+//            is Movie -> media.copy()
+//            else -> media
+//        }
+        val index = mediaList.indexOfFirst { media.id == it.id }
         if (index >= 0) {
-            mediaList[index] = clonedMedia
+            mediaList[index] = media
         }
         if (detailsMediaItem?.id == media.id) {
-            detailsMediaItem = clonedMedia
+            detailsMediaItem = media
         }
     }
 

@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.thewatchlist.data.Episode
 import com.example.thewatchlist.data.Media
 import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.Season
@@ -50,7 +51,7 @@ fun DetailedInfo(
         )
         is TV -> DetailedTV(
             tv = media,
-            onCheckmark = { state, tv -> dataViewModel.setEpisodeCheckmark(state, tv, media) }
+            onCheckmark = { state, tv, episode -> dataViewModel.setEpisodeCheckmark(state, tv, episode) }
         )
     }
 }
@@ -68,7 +69,7 @@ fun DetailedMovie(
 @Composable
 fun DetailedTV(
     tv: TV,
-    onCheckmark: (Boolean, TvEpisode) -> Unit
+    onCheckmark: (Boolean, TV, Episode) -> Unit
 ) {
 
 
@@ -76,8 +77,7 @@ fun DetailedTV(
         item { Text(text = tv.title) }
         item { Text(text = tv.overview) }
         tv.seasonsNew.forEach {
-//            item { DetailedTVSeasons(it, tv.seenList, onCheckmark) }
-            item { DetailedTVSeasons(tv = tv, season = it) }
+            item { DetailedTVSeasons(tv = tv, season = it, onCheckmark = onCheckmark) }
         }
     }
 }
@@ -95,7 +95,7 @@ fun DetailedTVSeasonNew(tv: TV, season: Season) {
 fun DetailedTVSeasons(
     tv: TV,
     season: Season,
-//    onCheckmark: (Boolean, TvEpisode) -> Unit
+    onCheckmark: (Boolean, TV, Episode) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     val seenSeasonCount = season.episodes.count { it.seen }
@@ -156,7 +156,7 @@ fun DetailedTVSeasons(
     HorizontalDivider()
 
     if (expanded) {
-        DetailedEpisodeList(tv, season)
+        DetailedEpisodeList(tv, season, onCheckmark)
     }
 
 }
@@ -166,8 +166,7 @@ fun DetailedTVSeasons(
 fun DetailedEpisodeList(
     tv: TV,
     season: Season,
-//    seenList: MutableSet<Pair<Int, Int>>,
-//    onCheckmark: (Boolean, TvEpisode) -> Unit)
+    onCheckmark: (Boolean, TV, Episode) -> Unit
 ) {
 
 
@@ -183,7 +182,7 @@ fun DetailedEpisodeList(
             leadingContent = {
                 Checkbox(
                     checked = it.seen,
-                    onCheckedChange = { /* state -> onCheckmark(state, it) */ })
+                    onCheckedChange = { state -> onCheckmark(state, tv, it) })
             }
         )
     }
