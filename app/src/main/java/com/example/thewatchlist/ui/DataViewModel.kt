@@ -13,15 +13,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.thewatchlist.WatchlistApplication
 import com.example.thewatchlist.data.MediaRepository
-import com.example.thewatchlist.data.media.Button
-import com.example.thewatchlist.data.media.Media
-import com.example.thewatchlist.data.media.Movie
-import com.example.thewatchlist.data.media.TV
+import com.example.thewatchlist.data.Media
+import com.example.thewatchlist.data.Movie
+import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.network.SearchStatus
-import com.example.thewatchlist.ui.theme.RemoveColor
 import info.movito.themoviedbapi.model.tv.TvEpisode
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -49,14 +46,6 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
             }
         }
     }
-
-    suspend fun updateEpisodes(tv: TV) {
-        // TODO: Reimplement
-//        viewModelScope.async { tv.updateEpisodes() }.await()
-//        updateMediaEntry(tv)
-
-    }
-
 
     fun setEpisodeCheckmark(checked: Boolean, episode: TvEpisode, tv: TV) {
         val seenEntry = Pair(episode.seasonNumber, episode.episodeNumber)
@@ -97,6 +86,22 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
             media.status = tab
             mediaList.add(media)
         }
+    }
+
+    suspend fun updateEpisodes(tv: TV) {
+        try {
+            tv.seasons.forEach { season ->
+                mediaRepository.getEpisodes(tv.id, season.seasonNumber)?.let { episodes ->
+                    if (episodes.isNotEmpty()) {
+                        season.episodes = episodes
+                    }
+                }
+            }
+            updateMediaEntry(tv)
+        } catch (e: Exception) {
+            throw e
+        }
+
     }
 
 

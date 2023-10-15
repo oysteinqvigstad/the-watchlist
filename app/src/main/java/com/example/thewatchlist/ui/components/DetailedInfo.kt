@@ -19,6 +19,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,9 +30,9 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.thewatchlist.data.media.Media
-import com.example.thewatchlist.data.media.Movie
-import com.example.thewatchlist.data.media.TV
+import com.example.thewatchlist.data.Media
+import com.example.thewatchlist.data.Movie
+import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.ui.DataViewModel
 import info.movito.themoviedbapi.model.tv.TvEpisode
 import info.movito.themoviedbapi.model.tv.TvSeason
@@ -69,15 +70,19 @@ fun DetailedTV(
     onCheckmark: (Boolean, TvEpisode) -> Unit
 ) {
 
+    LaunchedEffect(Unit) {
+        // This updates way too often!!
+
+    }
 
     LazyColumn {
         item { Text(text = tv.title) }
 //        item { Text(text = tv.) }
-//        item { Text(text = tv.tmdb.episodeRuntime.toString()) }
+//        item { Text(text = tv.tmdb) }
         item { Text(text = tv.overview) }
-//        tv.tmdb.seasons.forEach {
-//            item { DetailedTVSeasons(it, tv.seenList, onCheckmark) }
-//        }
+        tv.seasons.forEach {
+            item { DetailedTVSeasons(it, tv.seenList, onCheckmark) }
+        }
     }
 }
 

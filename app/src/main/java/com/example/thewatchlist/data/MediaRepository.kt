@@ -1,8 +1,5 @@
 package com.example.thewatchlist.data
 
-import com.example.thewatchlist.data.media.Media
-import com.example.thewatchlist.data.media.Movie
-import com.example.thewatchlist.data.media.TV
 import info.movito.themoviedbapi.TmdbApi
 import info.movito.themoviedbapi.model.MovieDb
 import info.movito.themoviedbapi.model.Multi
@@ -13,6 +10,7 @@ import kotlinx.coroutines.withContext
 
 interface MediaRepository {
     suspend fun getMultiMedia(title: String): List<Media>?
+    suspend fun getEpisodes(seriesId: Int, seasonId: Int): List<TvEpisode>?
 }
 
 class NetworkMediaRepository(thunk: () -> TmdbApi) : MediaRepository {
@@ -42,11 +40,7 @@ class NetworkMediaRepository(thunk: () -> TmdbApi) : MediaRepository {
     }
 
 
-
-
-
-
-    suspend fun getEpisodes(seriesId: Int, seasonId: Int): List<TvEpisode>? {
+    override suspend fun getEpisodes(seriesId: Int, seasonId: Int): List<TvEpisode>? {
         return withContext(Dispatchers.IO) {
             try {
                 api.tvSeasons.getSeason(seriesId, seasonId, "en").episodes

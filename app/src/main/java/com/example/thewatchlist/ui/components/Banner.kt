@@ -23,16 +23,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.thewatchlist.R
-import com.example.thewatchlist.data.media.Media
-import com.example.thewatchlist.data.media.Movie
-import com.example.thewatchlist.data.media.TV
+import com.example.thewatchlist.data.Media
+import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.theme.KashmirBlue
 import com.example.thewatchlist.ui.theme.RemoveColor
 
-
+/*
 @Composable
 fun Banner(
     media: Media,
@@ -69,12 +68,12 @@ fun TVBanner(
     }
 }
 
-
+*/
 
 
 @Composable
-fun MovieBannerTest(
-    movie: Movie,
+fun Banner(
+    media: Media,
     dataViewModel: DataViewModel,
     activeBottomNav: MainNavOption,
     onDetails: (Media) -> Unit,
@@ -93,21 +92,21 @@ fun MovieBannerTest(
             Column(modifier = Modifier.align(Alignment.CenterVertically)) {
 
                 Text(
-                    text = movie.title + "(" + movie.releaseYear.toString() + ")",
+                    text = media.title + "(" + media.releaseYear.toString() + ")",
                     fontSize = 20.sp,
                     modifier = Modifier
-                        .clickable { onDetails(movie) }
+                        .clickable { onDetails(media) }
                         .padding(bottom = 5.dp))
 
-                Text(text = formatMovieLength(movie.runtime),
+                Text(text = formatMovieLength(media.runtime),
                     fontSize = 12.sp,
                     modifier = Modifier.padding(bottom = 5.dp, start = 10.dp))
 
-                Text(text = movie.genres.take(3).joinToString(", ") { it.name },
+                Text(text = media.genres.take(3).joinToString(", ") { it.name },
                     fontSize = 12.sp,
                     modifier = Modifier.padding(bottom = 15.dp, start = 10.dp))
 
-                BannerPrimaryAction(media = movie, activeBottomNav = activeBottomNav, dataViewModel = dataViewModel)
+                BannerPrimaryAction(media = media, activeBottomNav = activeBottomNav, dataViewModel = dataViewModel)
             }
         }
 

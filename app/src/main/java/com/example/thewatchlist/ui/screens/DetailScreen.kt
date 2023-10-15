@@ -12,8 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
-import com.example.thewatchlist.data.media.Movie
-import com.example.thewatchlist.data.media.TV
+import com.example.thewatchlist.data.Movie
+import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.components.DetailedInfo
 

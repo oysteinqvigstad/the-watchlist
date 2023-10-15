@@ -1,7 +1,7 @@
 package com.example.thewatchlist.network
 
 import android.util.Log
-import com.example.thewatchlist.data.media.Media
+import com.example.thewatchlist.data.Media
 import info.movito.themoviedbapi.TmdbApi
 import info.movito.themoviedbapi.TmdbMovies
 import info.movito.themoviedbapi.TmdbSearch

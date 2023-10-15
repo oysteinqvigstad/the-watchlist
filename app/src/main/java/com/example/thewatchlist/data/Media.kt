@@ -1,16 +1,12 @@
-package com.example.thewatchlist.data.media
+package com.example.thewatchlist.data
 
-import androidx.compose.ui.graphics.Color
 import com.example.thewatchlist.data.navigation.TopNavOption
 import info.movito.themoviedbapi.model.Genre
 import info.movito.themoviedbapi.model.MovieDb
+import info.movito.themoviedbapi.model.tv.TvSeason
 import info.movito.themoviedbapi.model.tv.TvSeries
+import java.util.Date
 
-data class Button(
-    val label: String,
-    val action: (Media) -> Unit,
-    val color: Color
-)
 
 interface Media {
 
@@ -38,7 +34,7 @@ data class Movie (
         overview = tmdb.overview,
         genres = tmdb.genres,
         releaseYear = tmdb.releaseDate.split("-")[0].toIntOrNull() ?: 0,
-        runtime = Pair(tmdb.runtime / 60, tmdb.runtime % 60)
+        runtime = Pair(tmdb.runtime / 60, tmdb.runtime % 60),
     )
 
 }
@@ -51,7 +47,10 @@ data class TV (
     override val releaseYear: Int,
     override val runtime: Pair<Int, Int>,
     override var status: TopNavOption = TopNavOption.ToWatch,
-    var seenList: MutableSet<Pair<Int, Int>> = mutableSetOf()
+    var seenList: MutableSet<Pair<Int, Int>> = mutableSetOf(),
+    var seasons: List<TvSeason> = listOf(),
+    var seasonsNew: List<Season> = listOf(),
+    var lastUpdated: Date = Date(0)
 ) : Media {
     constructor(tmdb: TvSeries) : this(
         id = tmdb.id,
@@ -59,7 +58,29 @@ data class TV (
         overview = tmdb.overview,
         genres = tmdb.genres,
         releaseYear = tmdb.firstAirDate.split("-")[0].toIntOrNull() ?: 0,
-        runtime = Pair(tmdb.episodeRuntime.getOrElse(0) { 0 } / 60, tmdb.episodeRuntime.getOrElse(0) { 0 } % 60)
-
+        runtime = Pair(tmdb.episodeRuntime.getOrElse(0) { 0 } / 60, tmdb.episodeRuntime.getOrElse(0) { 0 } % 60),
+        seasons = tmdb.seasons,
+        seasonsNew = tmdb.seasons.map { Season(id = it.id, seasonNumber = it.seasonNumber, episodes = listOf()) }
     )
+    init {
+        seasons.forEach { if (it.episodes == null) it.episodes = listOf() }
+    }
 }
+
+
+data class Season (
+    val id: Int,
+    val seasonNumber: Int,
+    val episodes: List<Episode>
+)
+
+data class Episode (
+    val id: Int,
+    val episodeNumber: Int,
+    val seasonNumber: Int,
+    val airDate: Date,
+    val name: String,
+    val overview: String,
+    var seen: Boolean
+
+)
