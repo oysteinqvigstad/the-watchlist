@@ -44,45 +44,6 @@ import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.theme.KashmirBlue
 import com.example.thewatchlist.ui.theme.RemoveColor
 
-/*
-@Composable
-fun Banner(
-    media: Media,
-    dataViewModel: DataViewModel,
-    activeBottomNav: MainNavOption,
-    onDetails: (Media) -> Unit,
-) {
-
-    when (media) {
-        is Movie -> MovieBannerTest(
-            movie = media,
-            dataViewModel = dataViewModel,
-            activeBottomNav = activeBottomNav,
-            onDetails = onDetails,
-        )
-        is TV -> TVBanner(
-            tv = media,
-            dataViewModel = dataViewModel,
-            onDetails = onDetails
-        )
-    }
-}
-
-@Composable
-fun TVBanner(
-    tv: TV,
-    dataViewModel: DataViewModel,
-    onDetails: (Media) -> Unit
-) {
-    Row {
-        Text(text = "TV: " + tv.title, modifier = Modifier.clickable { onDetails(tv) })
-        Spacer(modifier = Modifier.padding(start = 2.dp))
-        Text(text = "+", modifier = Modifier.clickable { dataViewModel.moveMediaTo(tv, TopNavOption.ToWatch) })
-    }
-}
-
-*/
-
 
 @Composable
 fun Banner(
@@ -108,6 +69,7 @@ fun Banner(
         modifier = Modifier
             .padding(6.dp)
             .height(160.dp)
+            .clickable { onDetails(media) }
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
 
@@ -140,7 +102,6 @@ fun Banner(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
-                        .clickable { onDetails(media) }
                         .padding(top = 10.dp, bottom = 5.dp)
                 )
                 Text(text = media.releaseYear.let { if (it == 0) "TBA" else it.toString() } +
