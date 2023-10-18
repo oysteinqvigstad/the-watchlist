@@ -104,8 +104,12 @@ fun Banner(
                     modifier = Modifier
                         .padding(top = 10.dp, bottom = 5.dp)
                 )
-                Text(text = media.releaseYear.let { if (it == 0) "TBA" else it.toString() } +
-                        " \u2022 " + formatMovieLength(media.runtime),
+                Text(
+                    text = media.releaseYear.let { if (it == 0) "TBA" else it.toString() } +
+                            (formatMovieLength(media.runtime)?.let { " \u2022 " + it } ?: "") +
+                            if (media is TV) " \u2022 " + media.numberOfEpisodes + " episodes" else ""
+
+                    ,
                     fontSize = 12.sp,
                 )
 
@@ -128,9 +132,9 @@ fun Banner(
 
 
 
-fun formatMovieLength(time: Pair<Int, Int>): String {
+fun formatMovieLength(time: Pair<Int, Int>): String? {
     if (time.first == 0) {
-        return time.second.toString() + "min"
+        return if (time.second == 0) null else time.second.toString() + "min"
     }
     return time.first.toString() + "." + time.second + "h"
 }

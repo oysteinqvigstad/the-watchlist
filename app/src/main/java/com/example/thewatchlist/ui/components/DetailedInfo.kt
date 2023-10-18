@@ -80,7 +80,7 @@ fun DetailedMovie(
         mapOf(
             "Description:" to movie.overview,
             "Release Year:" to movie.releaseYear.toString(),
-            "Movie length:" to formatMovieLength(movie.runtime)
+            "Movie length:" to (formatMovieLength(movie.runtime) ?: "")
         )
     )
 /*

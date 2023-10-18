@@ -52,7 +52,7 @@ data class TV (
     override val runtime: Pair<Int, Int>,
     override var status: TopNavOption = TopNavOption.ToWatch,
     override val posterUrl: String,
-    var seenList: MutableSet<Pair<Int, Int>> = mutableSetOf(),
+    var numberOfEpisodes: Int,
     var seasons: List<TvSeason> = listOf(),
     var seasonsNew: List<Season> = listOf(),
     var lastUpdated: Date = Date(0)
@@ -64,6 +64,7 @@ data class TV (
         genres = tmdb.genres,
         releaseYear = tmdb.firstAirDate.split("-")[0].toIntOrNull() ?: 0,
         posterUrl = "https://image.tmdb.org/t/p/w200" + tmdb.posterPath,
+        numberOfEpisodes = tmdb.numberOfEpisodes,
         runtime = Pair(tmdb.episodeRuntime.getOrElse(0) { 0 } / 60, tmdb.episodeRuntime.getOrElse(0) { 0 } % 60),
         seasons = tmdb.seasons,
         seasonsNew = tmdb.seasons.map { Season(
