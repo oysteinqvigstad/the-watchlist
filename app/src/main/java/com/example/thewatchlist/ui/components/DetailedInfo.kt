@@ -1,10 +1,13 @@
 package com.example.thewatchlist.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.thewatchlist.data.Episode
@@ -57,13 +61,38 @@ fun DetailedInfo(
 }
 
 @Composable
+fun DetailedTopInfo(map: Map<String, String>) {
+
+    map.forEach() {data ->
+        if(data.value.isNotEmpty()) {
+            Text(text = data.key, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(text = data.value)
+            Spacer(modifier = Modifier.height(10.dp))
+        } else {
+            Log.d("Marthe", data.key+ " has no value!")
+        }
+    }
+}
+
+@Composable
 fun DetailedMovie(
     movie: Movie
 ) {
+
+    DetailedTopInfo(
+        mapOf(
+            "Description:" to movie.overview,
+            "Release Year:" to movie.releaseYear.toString(),
+            "Movie length:" to formatMovieLength(movie.runtime)
+        )
+    )
+/*
     Text(text = movie.title)
     Text(text = movie.releaseYear.toString())
     Text(text = formatMovieLength(movie.runtime))
     Text(text = movie.overview)
+
+ */
 }
 
 @Composable
