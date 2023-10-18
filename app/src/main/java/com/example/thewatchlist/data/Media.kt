@@ -17,6 +17,7 @@ interface Media {
     val overview: String
     val genres: List<Genre>
     val releaseYear: Int
+    val posterUrl: String
     val runtime: Pair<Int, Int>
 }
 
@@ -26,6 +27,7 @@ data class Movie (
     override val overview: String,
     override val genres: List<Genre>,
     override val releaseYear: Int,
+    override val posterUrl: String,
     override val runtime: Pair<Int, Int>,
     override var status: TopNavOption = TopNavOption.ToWatch
 ) : Media {
@@ -35,6 +37,7 @@ data class Movie (
         overview = tmdb.overview,
         genres = tmdb.genres,
         releaseYear = tmdb.releaseDate.split("-")[0].toIntOrNull() ?: 0,
+        posterUrl = tmdb.posterPath,
         runtime = Pair(tmdb.runtime / 60, tmdb.runtime % 60),
     )
 
@@ -48,6 +51,7 @@ data class TV (
     override val releaseYear: Int,
     override val runtime: Pair<Int, Int>,
     override var status: TopNavOption = TopNavOption.ToWatch,
+    override val posterUrl: String,
     var seenList: MutableSet<Pair<Int, Int>> = mutableSetOf(),
     var seasons: List<TvSeason> = listOf(),
     var seasonsNew: List<Season> = listOf(),
@@ -59,6 +63,7 @@ data class TV (
         overview = tmdb.overview,
         genres = tmdb.genres,
         releaseYear = tmdb.firstAirDate.split("-")[0].toIntOrNull() ?: 0,
+        posterUrl = tmdb.posterPath,
         runtime = Pair(tmdb.episodeRuntime.getOrElse(0) { 0 } / 60, tmdb.episodeRuntime.getOrElse(0) { 0 } % 60),
         seasons = tmdb.seasons,
         seasonsNew = tmdb.seasons.map { Season(
