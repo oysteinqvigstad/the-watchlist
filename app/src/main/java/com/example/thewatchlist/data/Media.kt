@@ -37,7 +37,7 @@ data class Movie (
         overview = tmdb.overview,
         genres = tmdb.genres,
         releaseYear = tmdb.releaseDate.split("-")[0].toIntOrNull() ?: 0,
-        posterUrl = tmdb.posterPath,
+        posterUrl =  "https://image.tmdb.org/t/p/w200 " + tmdb.posterPath,
         runtime = Pair(tmdb.runtime / 60, tmdb.runtime % 60),
     )
 
@@ -63,7 +63,7 @@ data class TV (
         overview = tmdb.overview,
         genres = tmdb.genres,
         releaseYear = tmdb.firstAirDate.split("-")[0].toIntOrNull() ?: 0,
-        posterUrl = tmdb.posterPath,
+        posterUrl = "https://image.tmdb.org/t/p/w200 " + tmdb.posterPath,
         runtime = Pair(tmdb.episodeRuntime.getOrElse(0) { 0 } / 60, tmdb.episodeRuntime.getOrElse(0) { 0 } % 60),
         seasons = tmdb.seasons,
         seasonsNew = tmdb.seasons.map { Season(
