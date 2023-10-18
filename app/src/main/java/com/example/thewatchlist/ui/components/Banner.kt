@@ -3,6 +3,7 @@ package com.example.thewatchlist.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,10 +20,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.example.thewatchlist.R
 import com.example.thewatchlist.data.Media
 import com.example.thewatchlist.data.TV
@@ -86,14 +93,28 @@ fun Banner(
         }
     }
 
+    val painter = rememberAsyncImagePainter(model = ImageRequest.Builder(LocalContext.current)
+        .data(media.posterUrl)
+        .size(coil.size.Size.ORIGINAL)
+        .build()
+    )
+
     Card(modifier = Modifier.padding(4.dp)) {
         Row(modifier = Modifier.fillMaxWidth()) {
 
-            Image(painter = painterResource(R.drawable.testbilde),
-                contentDescription = "Film poster",
-                modifier = Modifier
-                    .width(125.dp)
-                    .height(180.dp))
+            Box {
+                if (painter.state is AsyncImagePainter.State.Loading) {
+                    Text(text = "Image loading...")
+                } else {
+                    Image(
+                        painter = painter,
+                        modifier = Modifier
+                            .width(125.dp)
+                            .height(180.dp),
+                        contentDescription = "Film poster"
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.padding(start = 20.dp))
 
