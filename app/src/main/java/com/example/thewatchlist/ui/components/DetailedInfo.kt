@@ -1,16 +1,20 @@
 package com.example.thewatchlist.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -19,7 +23,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.thewatchlist.data.Episode
@@ -36,8 +40,6 @@ import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.Season
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.ui.DataViewModel
-import info.movito.themoviedbapi.model.tv.TvEpisode
-import info.movito.themoviedbapi.model.tv.TvSeason
 
 @Composable
 fun DetailedInfo(
@@ -57,13 +59,38 @@ fun DetailedInfo(
 }
 
 @Composable
+fun DetailedTopInfo(map: Map<String, String>) {
+
+    map.forEach() {data ->
+        if(data.value.isNotEmpty()) {
+            Text(text = data.key, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(text = data.value)
+            Spacer(modifier = Modifier.height(10.dp))
+        } else {
+            Log.d("Marthe", data.key+ " has no value!")
+        }
+    }
+}
+
+@Composable
 fun DetailedMovie(
     movie: Movie
 ) {
+
+    DetailedTopInfo(
+        mapOf(
+            "Description:" to movie.overview,
+            "Release Year:" to movie.releaseYear.toString(),
+            "Movie length:" to (formatMovieLength(movie.runtime) ?: "")
+        )
+    )
+/*
     Text(text = movie.title)
     Text(text = movie.releaseYear.toString())
     Text(text = formatMovieLength(movie.runtime))
     Text(text = movie.overview)
+
+ */
 }
 
 @Composable
@@ -85,7 +112,6 @@ fun DetailedTV(
 @Composable
 fun DetailedTVSeasonNew(tv: TV, season: Season) {
     Text(text = season.seasonNumber.toString() + ": "+ season.episodes.size.toString())
-
 }
 
 
@@ -106,32 +132,41 @@ fun DetailedTVSeasons(
         else ToggleableState.Indeterminate
     }
 
-    ListItem(
-        modifier = Modifier.clickable { expanded = !expanded },
-        headlineContent = {
-            Text(
-                text = season.title,
-//                modifier = Modifier.padding(start = 8.dp, top = 2.dp, bottom = 2.dp)
-            )
-        },
-        supportingContent = {
-            Column {
-                Text(text = String.format("%d episodes remaining", season.episodes.size - seenSeasonCount))
-                LinearProgressIndicator(
-                    progress = seenSeasonCount.toFloat() / season.episodes.size.toFloat(),
-                    modifier = Modifier.padding(all = 0.dp)
-                )
+    ElevatedCard(
+        modifier = Modifier.padding(8.dp)
+    ) {
 
-            }
-        },
-        leadingContent = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TriStateCheckbox(
-                    state = tristate(),
-                    onClick = {}
+        ListItem(
+            modifier = Modifier.clickable { expanded = !expanded },
+            headlineContent = {
+                Text(
+                    text = season.title,
+//                modifier = Modifier.padding(start = 8.dp, top = 2.dp, bottom = 2.dp)
                 )
+            },
+            supportingContent = {
+                Column {
+                    Text(
+                        text = String.format(
+                            "%d episodes remaining",
+                            season.episodes.size - seenSeasonCount
+                        )
+                    )
+                    LinearProgressIndicator(
+                        progress = seenSeasonCount.toFloat() / season.episodes.size.toFloat(),
+                        modifier = Modifier.padding(all = 0.dp)
+                    )
+
+                }
+            },
+            leadingContent = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TriStateCheckbox(
+                        state = tristate(),
+                        onClick = {}
+                    )
 //                Badge(
 //                    contentColor = if (seenAll) Color.Black else Color.White,
 //                    containerColor = if (seenAll) Color.Green else Color.Red
@@ -139,21 +174,20 @@ fun DetailedTVSeasons(
 //                    Text(text = String.format("%d/%d", seenSeasonCount, season.episodes.size))
 //                }
 
-            }
-        },
-        trailingContent = {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowUp,
-                contentDescription = "Collapse/Expand arrow",
-                modifier = Modifier
-                    .size(24.dp)
-                    .rotate(if (expanded) 0f else 180f)
-            )
+                }
+            },
+            trailingContent = {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = "Collapse/Expand arrow",
+                    modifier = Modifier
+                        .size(24.dp)
+                        .rotate(if (expanded) 0f else 180f)
+                )
 
-        },
-        tonalElevation = 2.dp,
-    )
-    HorizontalDivider()
+            },
+        )
+    }
 
     if (expanded) {
         DetailedEpisodeList(tv, season, onCheckmark)
@@ -195,7 +229,6 @@ fun DetailedEpisodeList(
 fun CustomCheckboxWithText(
     episodeNumber: Int,
     isChecked: Boolean,
-//    onCheckedChange: (Boolean) -> Unit
 ) {
     Box(
         modifier = Modifier
