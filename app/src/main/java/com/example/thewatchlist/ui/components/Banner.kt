@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,15 +15,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -99,7 +103,11 @@ fun Banner(
         .build()
     )
 
-    Card(modifier = Modifier.padding(4.dp)) {
+    Card(
+        modifier = Modifier
+            .padding(4.dp)
+            .height(160.dp)
+    ) {
         Row(modifier = Modifier.fillMaxWidth()) {
 
             Box {
@@ -108,34 +116,47 @@ fun Banner(
                 } else {
                     Image(
                         painter = painter,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .width(125.dp)
-                            .height(180.dp),
+                            .width(110.dp)
+                            .fillMaxHeight()
+                            .clip(MaterialTheme.shapes.medium),
+
+
                         contentDescription = "Film poster"
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.padding(start = 20.dp))
 
-            Column(modifier = Modifier.align(Alignment.CenterVertically)) {
+            Column(modifier = Modifier
+                .padding(start = 20.dp, end = 20.dp)
+            ) {
 
                 Text(
-                    text = media.title + "(" + media.releaseYear.toString() + ")",
-                    fontSize = 20.sp,
+                    text = media.title,
+                    fontSize = 18.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .clickable { onDetails(media) }
-                        .padding(bottom = 5.dp))
-
-                Text(text = formatMovieLength(media.runtime),
+                        .padding(top = 10.dp, bottom = 5.dp)
+                )
+                Text(text = media.releaseYear.let { if (it == 0) "TBA" else it.toString() } +
+                        " \u2022 " + formatMovieLength(media.runtime),
                     fontSize = 12.sp,
-                    modifier = Modifier.padding(bottom = 5.dp, start = 10.dp))
+                )
 
                 Text(text = media.genres.take(3).joinToString(", ") { it.name },
                     fontSize = 12.sp,
-                    modifier = Modifier.padding(bottom = 15.dp, start = 10.dp))
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
 
+
+                Spacer(modifier = Modifier.padding(top = 20.dp))
                 BannerPrimaryAction(media = media, activeBottomNav = activeBottomNav, dataViewModel = dataViewModel)
+
             }
         }
 
@@ -152,46 +173,6 @@ fun formatMovieLength(time: Pair<Int, Int>): String {
     return time.first.toString() + "." + time.second + "h"
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewMovie() {
-
-    Card(modifier = Modifier.padding(4.dp)) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-
-            Image(painter = painterResource(R.drawable.testbilde),
-                contentDescription = "Film poster",
-                modifier = Modifier
-                    .width(125.dp)
-                    .height(180.dp)
-                    .padding(5.dp))
-
-            Spacer(modifier = Modifier.padding(start = 20.dp))
-
-            Column(modifier = Modifier.align(Alignment.CenterVertically)) {
-
-                Text(text = "Avatar" , fontSize = 20.sp,
-                    modifier = Modifier.padding(bottom = 5.dp))
-                Text(text = "2.45h", fontSize = 12.sp,
-                    modifier = Modifier.padding(bottom = 5.dp, start = 10.dp))
-                Text(text = "Adventure", fontSize = 12.sp,
-                    modifier = Modifier.padding(bottom = 15.dp, start = 10.dp))
-
-                Button(onClick = { /*TODO*/ },
-                    colors = ButtonDefaults.buttonColors(Color(65, 106, 145)),
-                    modifier = Modifier
-                        .height(35.dp)
-                        .padding(start = 50.dp)) {
-
-                    Text(text = "Add to watchlist",
-                        fontSize = 10.sp)
-                }
-            }
-        }
-
-    }
-}
 
 @Composable
 fun BannerPrimaryAction(media: Media, dataViewModel: DataViewModel, activeBottomNav: MainNavOption) {

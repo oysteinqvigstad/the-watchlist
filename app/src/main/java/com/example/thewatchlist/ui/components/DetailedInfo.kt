@@ -19,7 +19,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,8 +35,6 @@ import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.Season
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.ui.DataViewModel
-import info.movito.themoviedbapi.model.tv.TvEpisode
-import info.movito.themoviedbapi.model.tv.TvSeason
 
 @Composable
 fun DetailedInfo(
@@ -85,7 +82,6 @@ fun DetailedTV(
 @Composable
 fun DetailedTVSeasonNew(tv: TV, season: Season) {
     Text(text = season.seasonNumber.toString() + ": "+ season.episodes.size.toString())
-
 }
 
 
@@ -195,7 +191,6 @@ fun DetailedEpisodeList(
 fun CustomCheckboxWithText(
     episodeNumber: Int,
     isChecked: Boolean,
-//    onCheckedChange: (Boolean) -> Unit
 ) {
     Box(
         modifier = Modifier
