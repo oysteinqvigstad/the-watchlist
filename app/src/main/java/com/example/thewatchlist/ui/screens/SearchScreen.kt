@@ -1,6 +1,8 @@
 package com.example.thewatchlist.ui.screens
 
+import android.os.Build
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -21,8 +23,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
+import coil.size.Size
+import com.example.thewatchlist.R
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.network.SearchStatus
 import com.example.thewatchlist.ui.DataViewModel
@@ -141,7 +151,29 @@ fun SearchResults(
 
 @Composable
 fun LoadingIndicator() {
-    Text(text = "Loading...")
+
+    val imageLoader = ImageLoader.Builder(LocalContext.current)
+        .components {
+            if (Build.VERSION.SDK_INT >= 28) {
+                add(ImageDecoderDecoder.Factory())
+            } else {
+                add(GifDecoder.Factory())
+            }
+        }
+        .build()
+
+    val gifPainter = rememberAsyncImagePainter( model = ImageRequest.Builder(LocalContext.current)
+        .data(data = R.drawable.frame_9__3_)
+        .size(Size.ORIGINAL)
+        .build(),
+        imageLoader = imageLoader)
+
+    Image(
+        painter = gifPainter,
+        contentDescription = "Loading gif",
+        modifier = Modifier
+            .fillMaxWidth()
+    )
 }
 
 @Composable
