@@ -1,5 +1,9 @@
 package com.example.thewatchlist.data
 
+import android.app.Application
+import androidx.room.Room
+import com.example.thewatchlist.data.persistence.StorageDb
+import com.example.thewatchlist.data.persistence.StorageRepository
 import info.movito.themoviedbapi.TmdbApi
 
 /**

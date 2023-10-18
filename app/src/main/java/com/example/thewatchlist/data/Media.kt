@@ -39,7 +39,6 @@ data class Movie (
         posterUrl =  "https://image.tmdb.org/t/p/w200" + tmdb.posterPath,
         runtime = Pair(tmdb.runtime / 60, tmdb.runtime % 60),
     )
-
 }
 
 data class TV (
