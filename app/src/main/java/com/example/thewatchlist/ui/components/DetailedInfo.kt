@@ -2,14 +2,17 @@ package com.example.thewatchlist.ui.components
 
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -22,6 +25,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TriStateCheckbox
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +44,11 @@ import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.Season
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.ui.DataViewModel
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import com.example.thewatchlist.ui.theme.Purple40
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+
 
 @Composable
 fun DetailedInfo(
@@ -59,38 +68,72 @@ fun DetailedInfo(
 }
 
 @Composable
-fun DetailedTopInfo(map: Map<String, String>) {
+fun DetailedTopInfo(description: String, map: Map<String, String>) {
 
-    map.forEach() {data ->
-        if(data.value.isNotEmpty()) {
-            Text(text = data.key, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Text(text = data.value)
-            Spacer(modifier = Modifier.height(10.dp))
-        } else {
-            Log.d("Marthe", data.key+ " has no value!")
+    Text(
+        text = "Description",
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp
+    )
+    HorizontalDivider(thickness = 2.dp, color = Purple40)
+    Spacer(modifier = Modifier.height(4.dp))
+
+    Text(text = description, textAlign = TextAlign.Justify)
+
+    Spacer(modifier = Modifier.height(12.dp))
+
+    map.forEach() { data ->
+
+        if (data.value.isNotEmpty()) {
+
+            Row(
+                //modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = data.key,
+                    textAlign = TextAlign.End,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    modifier = Modifier.width(120.dp)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+
+                VerticalDivider(
+                    thickness = 2.dp,
+                    color = Purple40,
+                    modifier = Modifier.height(24.dp)
+                )
+
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(text = data.value, fontSize = 16.sp, modifier = Modifier.width(120.dp))
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
         }
+
     }
+
 }
 
 @Composable
 fun DetailedMovie(
     movie: Movie
 ) {
+    LazyColumn(modifier = Modifier
+        .padding(10.dp)
+        .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        item { DetailedTopInfo(
+            movie.overview,
+            mapOf(
+                "Release Year" to movie.releaseYear.toString(),
+                "Movie length" to formatMovieLength(movie.runtime).toString()
+            )
+        ) }
+    }
 
-    DetailedTopInfo(
-        mapOf(
-            "Description:" to movie.overview,
-            "Release Year:" to movie.releaseYear.toString(),
-            "Movie length:" to (formatMovieLength(movie.runtime) ?: "")
-        )
-    )
-/*
-    Text(text = movie.title)
-    Text(text = movie.releaseYear.toString())
-    Text(text = formatMovieLength(movie.runtime))
-    Text(text = movie.overview)
-
- */
 }
 
 @Composable
@@ -99,10 +142,22 @@ fun DetailedTV(
     onCheckmark: (Boolean, TV, Episode) -> Unit
 ) {
 
+    LazyColumn(modifier = Modifier
+        .padding(10.dp)
+        .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-    LazyColumn {
-        item { Text(text = tv.title) }
-        item { Text(text = tv.overview) }
+        item { DetailedTopInfo(
+            tv.overview,
+            mapOf(
+                "Release Year" to tv.releaseYear.toString(),
+                "Seasons" to tv.seasons.size.toString()
+            )
+        ) }
+
+        item { Spacer(modifier = Modifier.height(12.dp)) }
+
         tv.seasonsNew.forEach {
             item { DetailedTVSeasons(tv = tv, season = it, onCheckmark = onCheckmark) }
         }
@@ -112,6 +167,7 @@ fun DetailedTV(
 @Composable
 fun DetailedTVSeasonNew(tv: TV, season: Season) {
     Text(text = season.seasonNumber.toString() + ": "+ season.episodes.size.toString())
+
 }
 
 
