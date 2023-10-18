@@ -15,8 +15,9 @@ import info.movito.themoviedbapi.model.tv.TvSeries
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+// TODO: Important, gotta change how results are returned due to bug
 sealed interface SearchStatus {
-    data class Success(val results: List<Media>): SearchStatus
+    object Success: SearchStatus
     object Loading: SearchStatus
     object Error: SearchStatus
     object NoAction: SearchStatus

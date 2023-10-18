@@ -33,6 +33,7 @@ fun ShowScreen(
             topNavItems = mainNavState.topNavShowsItems,
             onClick = { mainNavState.setShowNavItem(it) })
 
+
         dataViewModel.mediaList.forEach {
             if (it is TV && it.status == mainNavState.activeShowNavItem) {
                 Banner(

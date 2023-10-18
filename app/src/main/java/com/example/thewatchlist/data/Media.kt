@@ -68,9 +68,6 @@ data class TV (
             title = it.name
         ) }
     )
-    init {
-        seasons.forEach { if (it.episodes == null) it.episodes = listOf() }
-    }
 }
 
 

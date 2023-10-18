@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -36,12 +37,14 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
     var mediaList: SnapshotStateList<Media> = mutableStateListOf()
         private set
 
+    var searchResults: SnapshotStateList<Media>? = mutableStateListOf()
+
     suspend fun searchTmdb(title: String) {
         searchStatus = SearchStatus.Loading
         viewModelScope.launch {
             searchStatus = try {
-                val results = mediaRepository.getMultiMedia(title)
-                SearchStatus.Success(results = results!!)
+                searchResults = mediaRepository.getMultiMedia(title)?.toMutableStateList()
+                SearchStatus.Success
             } catch (e: IOException) {
                 SearchStatus.Error
             } catch (e: NullPointerException) {
@@ -51,26 +54,28 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
     }
 
     fun setEpisodeCheckmark(checked: Boolean, tv: TV, episode: Episode) {
-        val tv = tv.copy(seasonsNew = tv.seasonsNew.map { season ->
-            season.copy(episodes = season.episodes.map { ep ->
-                if (ep == episode) episode.copy(seen = checked) else ep
+        val updatedTv = tv.copy(seasonsNew = tv.seasonsNew.map { season ->
+            season.copy(episodes = season.episodes.map {
+                if (it == episode) episode.copy(seen = checked) else it
             })
         })
-        updateMediaEntry(tv)
+        updateMediaEntry(updatedTv)
     }
 
     private fun updateMediaEntry(media: Media) {
-//        val clonedMedia = when (media) {
-//            is TV -> media.copy()
-//            is Movie -> media.copy()
-//            else -> media
-//        }
-        val index = mediaList.indexOfFirst { media.id == it.id }
+        // updating media list in watchlist
+        var index = mediaList.indexOfFirst { media.id == it.id }
         if (index >= 0) {
             mediaList[index] = media
         }
+        // updating media in detail screen
         if (detailsMediaItem?.id == media.id) {
             detailsMediaItem = media
+        }
+
+        searchResults?.indexOfFirst { media.id == it.id }?.let { index ->
+            searchResults!![index] = media
+
         }
     }
 
@@ -90,36 +95,16 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
         }
     }
 
-    suspend fun updateEpisodes(tv: TV) {
-        try {
-            tv.seasons.forEach { season ->
-                mediaRepository.getEpisodes(tv.id, season.seasonNumber)?.let { episodes ->
-                    if (episodes.isNotEmpty()) {
-                        season.episodes = episodes
-                    }
-                }
-            }
-            updateMediaEntry(tv)
-        } catch (e: Exception) {
-            throw e
-        }
-
-    }
-
-
     suspend fun updateEpisodesNew(tv: TV) {
         try {
-            tv.seasonsNew = tv.seasonsNew.map { season ->
-                Log.d("me", tv.id.toString() + " " + season.seasonNumber)
+            val newTv = tv.copy(seasonsNew = tv.seasonsNew.map { season ->
                 mediaRepository.getEpisodesNew(tv.id, season.seasonNumber)!!.let { episodes ->
-                    Log.d("me", "here?")
-                    Log.d("me", "hentet episoder:" + episodes.size)
                     season.copy(episodes = episodes.map { episode ->
                         season.episodes.find { episode.episodeNumber == it.episodeNumber } ?: episode
                     }.sortedBy { it.episodeNumber })
                 }
-            }
-            updateMediaEntry(tv)
+            })
+            updateMediaEntry(newTv)
         } catch (e: Exception) {
             Log.d("me", "Ooops")
 

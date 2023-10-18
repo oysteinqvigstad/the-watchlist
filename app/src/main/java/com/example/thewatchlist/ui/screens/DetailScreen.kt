@@ -29,7 +29,6 @@ fun DetailScreen(
 
     LaunchedEffect(Unit) {
         if (media is TV) {
-//            dataViewModel.updateEpisodes(media)
             dataViewModel.updateEpisodesNew(media)
         }
     }

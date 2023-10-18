@@ -106,7 +106,6 @@ fun SearchResults(
 ) {
     LaunchedEffect(searchText) {
         searchText?.let {
-            Log.d("me", "logged $searchText")
             dataViewModel.searchTmdb(it)
         }
     }
@@ -116,7 +115,7 @@ fun SearchResults(
         item {
             when (val res = dataViewModel.searchStatus) {
                 is SearchStatus.Success -> {
-                    res.results.forEach {
+                    dataViewModel.searchResults?.forEach {
                         Banner(
                             media = it,
                             activeBottomNav = MainNavOption.Search,
