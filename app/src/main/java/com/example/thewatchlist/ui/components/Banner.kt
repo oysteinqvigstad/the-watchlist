@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -103,9 +104,9 @@ fun Banner(
         .build()
     )
 
-    Card(
+    ElevatedCard(
         modifier = Modifier
-            .padding(4.dp)
+            .padding(6.dp)
             .height(160.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -154,7 +155,7 @@ fun Banner(
                 )
 
 
-                Spacer(modifier = Modifier.padding(top = 20.dp))
+                Spacer(modifier = Modifier.padding(top = 25.dp))
                 BannerPrimaryAction(media = media, activeBottomNav = activeBottomNav, dataViewModel = dataViewModel)
 
             }
