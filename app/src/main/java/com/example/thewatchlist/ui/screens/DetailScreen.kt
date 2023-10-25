@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
 import com.example.thewatchlist.data.Media
-import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.components.DetailedInfo
@@ -29,7 +28,7 @@ fun DetailScreen(
 
     LaunchedEffect(Unit) {
         if (media is TV) {
-            dataViewModel.updateEpisodesNew(media)
+            dataViewModel.updateEpisodes(media)
         }
     }
 

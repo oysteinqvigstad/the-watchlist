@@ -62,7 +62,8 @@ fun DetailedInfo(
         )
         is TV -> DetailedTV(
             tv = media,
-            onCheckmark = { state, tv, episode -> dataViewModel.setEpisodeCheckmark(state, tv, episode) }
+            onCheckmark = { state, tv, episode -> dataViewModel.setEpisodeCheckmark(state, tv, episode) },
+            onSeasonCheckmark = { state, tv, season -> dataViewModel.setSeasonCheckmark(state, tv, season) }
         )
     }
 }
@@ -139,7 +140,8 @@ fun DetailedMovie(
 @Composable
 fun DetailedTV(
     tv: TV,
-    onCheckmark: (Boolean, TV, Episode) -> Unit
+    onCheckmark: (Boolean, TV, Episode) -> Unit,
+    onSeasonCheckmark: (Boolean, TV, Season) -> Unit
 ) {
 
     LazyColumn(modifier = Modifier
@@ -159,16 +161,16 @@ fun DetailedTV(
         item { Spacer(modifier = Modifier.height(12.dp)) }
 
         tv.seasonsNew.forEach {
-            item { DetailedTVSeasons(tv = tv, season = it, onCheckmark = onCheckmark) }
+            item { DetailedTVSeasons(
+                tv = tv,
+                season = it,
+                onCheckmark = onCheckmark,
+                onSeasonCheckmark = onSeasonCheckmark
+            )}
         }
     }
 }
 
-@Composable
-fun DetailedTVSeasonNew(tv: TV, season: Season) {
-    Text(text = season.seasonNumber.toString() + ": "+ season.episodes.size.toString())
-
-}
 
 
 
@@ -177,7 +179,8 @@ fun DetailedTVSeasonNew(tv: TV, season: Season) {
 fun DetailedTVSeasons(
     tv: TV,
     season: Season,
-    onCheckmark: (Boolean, TV, Episode) -> Unit
+    onCheckmark: (Boolean, TV, Episode) -> Unit,
+    onSeasonCheckmark: (Boolean, TV, Season) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     val seenSeasonCount = season.episodes.count { it.seen }
@@ -189,7 +192,7 @@ fun DetailedTVSeasons(
     }
 
     ElevatedCard(
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)
     ) {
 
         ListItem(
@@ -197,7 +200,6 @@ fun DetailedTVSeasons(
             headlineContent = {
                 Text(
                     text = season.title,
-//                modifier = Modifier.padding(start = 8.dp, top = 2.dp, bottom = 2.dp)
                 )
             },
             supportingContent = {
@@ -221,15 +223,8 @@ fun DetailedTVSeasons(
                 ) {
                     TriStateCheckbox(
                         state = tristate(),
-                        onClick = {}
+                        onClick = { onSeasonCheckmark(!seenAll, tv, season) }
                     )
-//                Badge(
-//                    contentColor = if (seenAll) Color.Black else Color.White,
-//                    containerColor = if (seenAll) Color.Green else Color.Red
-//                ) {
-//                    Text(text = String.format("%d/%d", seenSeasonCount, season.episodes.size))
-//                }
-
                 }
             },
             trailingContent = {
@@ -260,23 +255,25 @@ fun DetailedEpisodeList(
 ) {
 
 
-    season.episodes.forEach {
-        ListItem(
-            headlineContent = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = String.format("S%02dE%02d: %s", it.seasonNumber, it.episodeNumber, it.title))
-                } },
-//            supportingContent = {
-//                Text(text = it.overview, maxLines = 3, overflow = TextOverflow.Ellipsis)
-//            },
-            leadingContent = {
-                Checkbox(
-                    checked = it.seen,
-                    onCheckedChange = { state -> onCheckmark(state, tv, it) })
-            }
-        )
-    }
+    Column(
+        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+    ) {
 
+        season.episodes.forEach {
+            ListItem(
+                headlineContent = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = String.format("S%02dE%02d: %s", it.seasonNumber, it.episodeNumber, it.title))
+                    } },
+                leadingContent = {
+                    Checkbox(
+                        checked = it.seen,
+                        onCheckedChange = { state -> onCheckmark(state, tv, it) })
+                }
+            )
+        }
+
+    }
 
 }
 

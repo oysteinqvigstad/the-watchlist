@@ -17,13 +17,11 @@ import com.example.thewatchlist.WatchlistApplication
 import com.example.thewatchlist.data.Episode
 import com.example.thewatchlist.data.MediaRepository
 import com.example.thewatchlist.data.Media
-import com.example.thewatchlist.data.Movie
+import com.example.thewatchlist.data.Season
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.network.SearchStatus
-import info.movito.themoviedbapi.model.tv.TvEpisode
 import kotlinx.coroutines.launch
-import org.apache.commons.lang3.ObjectUtils.Null
 import java.io.IOException
 
 
@@ -51,6 +49,16 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
                 SearchStatus.Error
             }
         }
+    }
+
+    fun setSeasonCheckmark(checked: Boolean, tv: TV, season: Season) {
+        val updatedEpisodes = season.episodes.map {
+            it.copy(seen = checked)
+        }
+        val updatedTv = tv.copy(seasonsNew = tv.seasonsNew.map {
+            if (it == season) season.copy(episodes = updatedEpisodes) else it
+        })
+        updateMediaEntry(updatedTv)
     }
 
     fun setEpisodeCheckmark(checked: Boolean, tv: TV, episode: Episode) {
@@ -95,7 +103,7 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
         }
     }
 
-    suspend fun updateEpisodesNew(tv: TV) {
+    suspend fun updateEpisodes(tv: TV) {
         try {
             val newTv = tv.copy(seasonsNew = tv.seasonsNew.map { season ->
                 mediaRepository.getEpisodesNew(tv.id, season.seasonNumber)!!.let { episodes ->

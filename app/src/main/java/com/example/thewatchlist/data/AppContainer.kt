@@ -4,7 +4,6 @@ import info.movito.themoviedbapi.TmdbApi
 
 interface AppContainer {
     val mediaRepository: MediaRepository
-    val photoRepository: PhotoRepository
 }
 
 class DefaultAppContainer : AppContainer {
@@ -15,6 +14,5 @@ class DefaultAppContainer : AppContainer {
     override val mediaRepository: MediaRepository by lazy {
         NetworkMediaRepository { api }
     }
-    override val photoRepository = NetworkPhotoRepository()
 
 }
