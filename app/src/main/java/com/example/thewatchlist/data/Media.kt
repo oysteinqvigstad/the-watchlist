@@ -4,7 +4,6 @@ import com.example.thewatchlist.data.navigation.TopNavOption
 import info.movito.themoviedbapi.model.Genre
 import info.movito.themoviedbapi.model.MovieDb
 import info.movito.themoviedbapi.model.tv.TvEpisode
-import info.movito.themoviedbapi.model.tv.TvSeason
 import info.movito.themoviedbapi.model.tv.TvSeries
 import java.util.Date
 
@@ -53,8 +52,7 @@ data class TV (
     override var status: TopNavOption = TopNavOption.ToWatch,
     override val posterUrl: String,
     var numberOfEpisodes: Int,
-    var seasons: List<TvSeason> = listOf(),
-    var seasonsNew: List<Season> = listOf(),
+    var seasons: List<Season> = listOf(),
     var lastUpdated: Date = Date(0)
 ) : Media {
     constructor(tmdb: TvSeries) : this(
@@ -66,8 +64,7 @@ data class TV (
         posterUrl = "https://image.tmdb.org/t/p/w200" + tmdb.posterPath,
         numberOfEpisodes = tmdb.numberOfEpisodes,
         runtime = Pair(tmdb.episodeRuntime.getOrElse(0) { 0 } / 60, tmdb.episodeRuntime.getOrElse(0) { 0 } % 60),
-        seasons = tmdb.seasons,
-        seasonsNew = tmdb.seasons.map { Season(
+        seasons = tmdb.seasons.map { Season(
             id = it.id,
             seasonNumber = it.seasonNumber,
             episodes = listOf(),

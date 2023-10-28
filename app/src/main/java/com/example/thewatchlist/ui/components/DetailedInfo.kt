@@ -1,8 +1,6 @@
 package com.example.thewatchlist.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -44,10 +42,8 @@ import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.Season
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.ui.DataViewModel
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.example.thewatchlist.ui.theme.Purple40
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 
 @Composable
@@ -160,7 +156,7 @@ fun DetailedTV(
 
         item { Spacer(modifier = Modifier.height(12.dp)) }
 
-        tv.seasonsNew.forEach {
+        tv.seasons.forEach {
             item { DetailedTVSeasons(
                 tv = tv,
                 season = it,

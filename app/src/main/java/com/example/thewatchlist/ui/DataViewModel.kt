@@ -55,14 +55,14 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
         val updatedEpisodes = season.episodes.map {
             it.copy(seen = checked)
         }
-        val updatedTv = tv.copy(seasonsNew = tv.seasonsNew.map {
+        val updatedTv = tv.copy(seasons = tv.seasons.map {
             if (it == season) season.copy(episodes = updatedEpisodes) else it
         })
         updateMediaEntry(updatedTv)
     }
 
     fun setEpisodeCheckmark(checked: Boolean, tv: TV, episode: Episode) {
-        val updatedTv = tv.copy(seasonsNew = tv.seasonsNew.map { season ->
+        val updatedTv = tv.copy(seasons = tv.seasons.map { season ->
             season.copy(episodes = season.episodes.map {
                 if (it == episode) episode.copy(seen = checked) else it
             })
@@ -72,7 +72,7 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
 
     private fun updateMediaEntry(media: Media) {
         // updating media list in watchlist
-        var index = mediaList.indexOfFirst { media.id == it.id }
+        val index = mediaList.indexOfFirst { media.id == it.id }
         if (index >= 0) {
             mediaList[index] = media
         }
@@ -102,11 +102,24 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
             mediaList.add(media)
         }
     }
+    suspend fun updateSeasonInfo(tv: TV) {
+        try {
+            val downloadedShow = mediaRepository.getSeries(tv.id)
+            downloadedShow?.seasons?.forEach { season ->
+                if (tv.seasons.find { it.id == season.id } == null) {
+                    tv.seasons += season
+                }
+            }
+            updateMediaEntry(tv)
+        } catch (e: Exception) {
+            Log.d("me", "Ooops")
+        }
+    }
 
     suspend fun updateEpisodes(tv: TV) {
         try {
-            val newTv = tv.copy(seasonsNew = tv.seasonsNew.map { season ->
-                mediaRepository.getEpisodesNew(tv.id, season.seasonNumber)!!.let { episodes ->
+            val newTv = tv.copy(seasons = tv.seasons.map { season ->
+                mediaRepository.getEpisodes(tv.id, season.seasonNumber)!!.let { episodes ->
                     season.copy(episodes = episodes.map { episode ->
                         season.episodes.find { episode.episodeNumber == it.episodeNumber } ?: episode
                     }.sortedBy { it.episodeNumber })
