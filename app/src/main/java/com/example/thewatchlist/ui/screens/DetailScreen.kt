@@ -17,6 +17,13 @@ import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.components.DetailedInfo
 
+/**
+ * Composable function representing the detail screen for a media item.
+ *
+ * @param navController The navigation controller for managing screen transitions.
+ * @param dataViewModel The ViewModel for managing data related to the app.
+ * @param media The media item for which to display details.
+ */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,7 +32,7 @@ fun DetailScreen(
     dataViewModel: DataViewModel,
     media: Media
 ) {
-
+    // Use LaunchedEffect to trigger updates for TV series if the media is of type TV
     LaunchedEffect(Unit) {
         if (media is TV) {
             dataViewModel.updateSeasonInfo(media)
@@ -33,9 +40,9 @@ fun DetailScreen(
         }
     }
 
-
-
+    // Create a column layout to contain the top app bar, navigation, and media details
     Column {
+        // Display a centered top app bar with a back navigation icon and media title
         CenterAlignedTopAppBar(
             navigationIcon = {
                 IconButton(

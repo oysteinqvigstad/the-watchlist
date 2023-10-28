@@ -38,7 +38,14 @@ import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.theme.KashmirBlue
 import com.example.thewatchlist.ui.theme.RemoveColor
 
-
+/**
+ * Composable function to display a banner for a media item with details.
+ *
+ * @param media The media item to display in the banner.
+ * @param dataViewModel The view model containing data and actions related to media items.
+ * @param activeBottomNav The active bottom navigation option.
+ * @param onDetails Callback to handle details click.
+ */
 @Composable
 fun Banner(
     media: Media,
@@ -53,12 +60,14 @@ fun Banner(
         }
     }
 
+    // Asynchronously load the image for the media item
     val painter = rememberAsyncImagePainter(model = ImageRequest.Builder(LocalContext.current)
         .data(media.posterUrl)
         .size(coil.size.Size.ORIGINAL)
         .build()
     )
 
+    // Create an elevated card for the banner
     ElevatedCard(
         modifier = Modifier
             .padding(6.dp)
@@ -68,6 +77,7 @@ fun Banner(
         Row(modifier = Modifier.fillMaxWidth()) {
 
             Box {
+                // Display loading text or the media item image
                 if (painter.state is AsyncImagePainter.State.Loading) {
                     Text(text = "Image loading...")
                 } else {
@@ -85,7 +95,7 @@ fun Banner(
                 }
             }
 
-
+            // Display media details in a column
             Column(modifier = Modifier
                 .padding(start = 20.dp, end = 20.dp)
             ) {
@@ -112,9 +122,9 @@ fun Banner(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-
-
                 Spacer(modifier = Modifier.padding(top = 25.dp))
+
+                // Display primary action button based on the active bottom navigation and media status
                 BannerPrimaryAction(media = media, activeBottomNav = activeBottomNav, dataViewModel = dataViewModel)
 
             }
@@ -125,7 +135,12 @@ fun Banner(
 
 
 
-
+/**
+ * Format movie length into a readable string.
+ *
+ * @param time The movie length as a pair of hours and minutes.
+ * @return A formatted string representing the movie length.
+ */
 fun formatMovieLength(time: Pair<Int, Int>): String? {
     if (time.first == 0) {
         return if (time.second == 0) null else time.second.toString() + "min"
@@ -133,9 +148,16 @@ fun formatMovieLength(time: Pair<Int, Int>): String? {
     return time.first.toString() + "." + time.second + "h"
 }
 
-
+/**
+ * Composable function to display the primary action button in the banner.
+ *
+ * @param media The media item for which to display the action button.
+ * @param dataViewModel The view model containing data and actions related to media items.
+ * @param activeBottomNav The active bottom navigation option.
+ */
 @Composable
 fun BannerPrimaryAction(media: Media, dataViewModel: DataViewModel, activeBottomNav: MainNavOption) {
+    // Determine and display the appropriate action button based on the active bottom navigation and media status
     if (activeBottomNav == MainNavOption.Search) {
         if (dataViewModel.isInWatchlist(media)) {
             BannerActionButton(media = media, label = "Remove from Watchlist", action = { dataViewModel.moveMediaTo(it, null) }, color = RemoveColor)
@@ -151,7 +173,14 @@ fun BannerPrimaryAction(media: Media, dataViewModel: DataViewModel, activeBottom
     }
 }
 
-
+/**
+ * Composable function to display an action button in the banner.
+ *
+ * @param media The media item for which to display the action button.
+ * @param label The label for the action button.
+ * @param action Callback to handle the action button click.
+ * @param color The color for the action button.
+ */
 @Composable
 fun BannerActionButton(media: Media, label: String, action: (Media) -> Unit, color: Color) {
     Button(

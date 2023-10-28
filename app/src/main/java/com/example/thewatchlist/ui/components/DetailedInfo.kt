@@ -45,13 +45,18 @@ import com.example.thewatchlist.ui.DataViewModel
 import androidx.compose.ui.text.style.TextAlign
 import com.example.thewatchlist.ui.theme.Purple40
 
-
+/**
+ * Composable function to display detailed information for a media item.
+ *
+ * @param media The media item for which to display details.
+ * @param dataViewModel The ViewModel for managing data related to the app.
+ */
 @Composable
 fun DetailedInfo(
     media: Media,
     dataViewModel: DataViewModel
 ) {
-
+    // Choose the appropriate composable based on the type of media
     when (media) {
         is Movie -> DetailedMovie(
             movie = media
@@ -64,6 +69,12 @@ fun DetailedInfo(
     }
 }
 
+/**
+ * Composable function to display detailed top information, such as description and metadata.
+ *
+ * @param description The description of the media item.
+ * @param map A map containing metadata information.
+ */
 @Composable
 fun DetailedTopInfo(description: String, map: Map<String, String>) {
 
@@ -113,10 +124,16 @@ fun DetailedTopInfo(description: String, map: Map<String, String>) {
 
 }
 
+/**
+ * Composable function to display detailed information for a movie.
+ *
+ * @param movie The movie for which to display details.
+ */
 @Composable
 fun DetailedMovie(
     movie: Movie
 ) {
+    // Display detailed information for the movie
     LazyColumn(modifier = Modifier
         .padding(10.dp)
         .fillMaxWidth(),
@@ -133,13 +150,20 @@ fun DetailedMovie(
 
 }
 
+/**
+ * Composable function to display detailed information for a TV series.
+ *
+ * @param tv The TV series for which to display details.
+ * @param onCheckmark Callback for handling episode checkmark changes.
+ * @param onSeasonCheckmark Callback for handling season checkmark changes.
+ */
 @Composable
 fun DetailedTV(
     tv: TV,
     onCheckmark: (Boolean, TV, Episode) -> Unit,
     onSeasonCheckmark: (Boolean, TV, Season) -> Unit
 ) {
-
+    // Display detailed information for the TV series, including seasons and episodes
     LazyColumn(modifier = Modifier
         .padding(10.dp)
         .fillMaxWidth(),
@@ -156,6 +180,7 @@ fun DetailedTV(
 
         item { Spacer(modifier = Modifier.height(12.dp)) }
 
+        // Iterate through seasons and display detailed information for each season
         tv.seasons.forEach {
             item { DetailedTVSeasons(
                 tv = tv,
@@ -167,9 +192,14 @@ fun DetailedTV(
     }
 }
 
-
-
-
+/**
+ * Composable function to display detailed information for TV series seasons and episodes.
+ *
+ * @param tv The TV series for which to display details.
+ * @param season The season of the TV series.
+ * @param onCheckmark Callback for handling episode checkmark changes.
+ * @param onSeasonCheckmark Callback for handling season checkmark changes.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailedTVSeasons(
@@ -178,15 +208,21 @@ fun DetailedTVSeasons(
     onCheckmark: (Boolean, TV, Episode) -> Unit,
     onSeasonCheckmark: (Boolean, TV, Season) -> Unit
 ) {
+    // Define and manage the expansion state of the season information
     var expanded by remember { mutableStateOf(false) }
+
+    // Calculate the count of seen episodes and check if all episodes are seen
     val seenSeasonCount = season.episodes.count { it.seen }
     val seenAll = seenSeasonCount == season.episodes.size
+
+    // Determine the tri-state state based on the season
     val tristate = {
         if (seenAll) ToggleableState.On
         else if (seenSeasonCount == 0) ToggleableState.Off
         else ToggleableState.Indeterminate
     }
 
+    // Create an elevated card to contain season information
     ElevatedCard(
         modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)
     ) {
@@ -236,12 +272,20 @@ fun DetailedTVSeasons(
         )
     }
 
+    // If expanded, display the episode list
     if (expanded) {
         DetailedEpisodeList(tv, season, onCheckmark)
     }
 
 }
 
+/**
+ * Composable function to display a list of detailed episodes for a TV series season.
+ *
+ * @param tv The TV series for which to display details.
+ * @param season The season for which to display episodes.
+ * @param onCheckmark Callback for handling episode checkmark changes.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailedEpisodeList(
@@ -254,7 +298,7 @@ fun DetailedEpisodeList(
     Column(
         modifier = Modifier.padding(start = 10.dp, end = 10.dp)
     ) {
-
+        // Iterate through episodes and display episode details
         season.episodes.forEach {
             ListItem(
                 headlineContent = {
@@ -271,28 +315,4 @@ fun DetailedEpisodeList(
 
     }
 
-}
-
-
-@Composable
-fun CustomCheckboxWithText(
-    episodeNumber: Int,
-    isChecked: Boolean,
-) {
-    Box(
-        modifier = Modifier
-            .clickable {}, // onCheckedChange(!isChecked) },
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Checkbox(
-            modifier = Modifier.padding(all = 0.dp),
-            checked = isChecked,
-            onCheckedChange = {}, //onCheckedChange,
-        )
-        Text(
-            text = String.format("%02d", episodeNumber),
-            fontSize = 12.sp,
-            modifier = Modifier.align(Alignment.Center)
-        )
-    }
 }

@@ -27,7 +27,13 @@ import com.example.thewatchlist.ui.screens.SettingsScreen
 import com.example.thewatchlist.ui.screens.ShowScreen
 import com.example.thewatchlist.ui.theme.KashmirBlue
 
-
+/**
+ * Composable function that represents the main navigation controller for the app.
+ *
+ * @param navController The navigation controller for managing navigation within the app.
+ * @param mainNavState The ViewModel responsible for managing the state of the main navigation.
+ * @param dataViewModel The ViewModel responsible for managing data related to the app.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavController(
@@ -35,11 +41,14 @@ fun MainNavController(
     mainNavState: MainNavState = viewModel(),
     dataViewModel: DataViewModel = viewModel(factory = DataViewModel.Factory)
 ) {
+    // Get the active menu item from the mainNavState ViewModel
     val activeMenuItem = mainNavState.activeMainNavItem
 
+    // Create a Scaffold with a bottom and top navigation bar
     Scaffold(
         bottomBar =  {
             NavigationBar {
+                // set the appropriate top bar options
                 mainNavState.mainNavItems.forEach { item ->
                     NavigationBarItem(
                         icon = {
@@ -52,6 +61,7 @@ fun MainNavController(
                         label = { Text(item.mainNavOption.toString()) },
                         selected = activeMenuItem == item.mainNavOption,
                         onClick = {
+                            // Set the active main navigation item and navigate
                             mainNavState.setMainNavItem(item.mainNavOption)
                             navController.navigate(item.mainNavOption.toString())
                         }
@@ -66,6 +76,7 @@ fun MainNavController(
             startDestination = mainNavState.activeMainNavItem.toString(),
             modifier = Modifier.padding(innerPadding)
         ) {
+            // Define composable destinations for various main navigation options
             composable(MainNavOption.Search.toString()) {
                 SearchScreen(
                     dataViewModel = dataViewModel,
@@ -105,17 +116,26 @@ fun MainNavController(
 
 }
 
+/**
+ * Composable function that represents a tab navigation bar.
+ *
+ * @param activeTopNavOption The currently active top navigation option.
+ * @param topNavItems A list of top navigation options to display as tabs.
+ * @param onClick A callback function to handle tab click events.
+ */
 @Composable
 fun TabNavigation(
     activeTopNavOption: TopNavOption = TopNavOption.ToWatch,
     topNavItems: List<TopNavOption>,
     onClick: (TopNavOption) -> Unit = {}
 ) {
+    // Create a secondary tab row for displaying the top navigation options
     SecondaryTabRow(
         selectedTabIndex = topNavItems.indexOf(activeTopNavOption),
         contentColor = KashmirBlue
 
     ) {
+        // Iterate through the top navigation items to create individual tabs
         topNavItems.forEach { type ->
             Tab(
                 text = { Text(text = type.toString()) },

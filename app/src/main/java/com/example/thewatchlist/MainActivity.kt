@@ -12,6 +12,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.thewatchlist.ui.MainNavController
 import com.example.thewatchlist.ui.theme.TheWatchlistTheme
 
+/**
+ * This is the main activity for the application.
+ * It sets up the application's user interface and initializes the navigation system.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

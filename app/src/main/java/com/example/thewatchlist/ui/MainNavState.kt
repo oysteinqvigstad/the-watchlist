@@ -10,13 +10,15 @@ import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
 
 /**
- * ViewModel that keeps the state of the main menu
+ * ViewModel class that manages the navigation state of the application.
  */
 class MainNavState : ViewModel() {
+    // Properties to keep track of active navigation items
     var activeMainNavItem by mutableStateOf(MainNavOption.Movies)
     var activeMovieNavItem by mutableStateOf(TopNavOption.ToWatch)
     var activeShowNavItem by mutableStateOf(TopNavOption.Watching)
 
+    // Lists of navigation items and icons
     var mainNavItems = listOf(
         MainNavItem(MainNavOption.Search, R.drawable.ic_search_active, R.drawable.ic_search, "search"),
         MainNavItem(MainNavOption.Movies, R.drawable.ic_film_active, R.drawable.ic_film, "movies"),
@@ -34,18 +36,35 @@ class MainNavState : ViewModel() {
         TopNavOption.History
     )
 
+    /**
+     * Function to set the active main navigation item.
+     * @param mainNavOption The selected main navigation item.
+     */
     fun setMainNavItem(mainNavOption: MainNavOption) {
         activeMainNavItem = mainNavOption
     }
 
+    /**
+     * Function to set the active movie navigation item.
+     * @param navOption The selected movie navigation item.
+     */
     fun setMovieNavItem(navOption: TopNavOption) {
         activeMovieNavItem = navOption
     }
 
+    /**
+     * Function to set the active show navigation item.
+     * @param navOption The selected show navigation item.
+     */
     fun setShowNavItem(navOption: TopNavOption) {
         activeShowNavItem = navOption
     }
 
+    /**
+     * Function to get the appropriate icon for a menu item.
+     * @param menuItem The menu item to retrieve the icon for.
+     * @return The icon resource ID based on the active main navigation item.
+     */
     fun getImageId(menuItem: MainNavItem): Int {
         return if (menuItem.mainNavOption == activeMainNavItem) menuItem.icon else menuItem.icon2
     }

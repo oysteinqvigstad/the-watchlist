@@ -6,6 +6,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.CenterAlignedTopAppBar
 
+/**
+ * Composable function representing the settings screen.
+ *
+ * @param title The title of the screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
