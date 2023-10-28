@@ -1,7 +1,6 @@
 package com.example.thewatchlist.ui.screens
 
 import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -34,7 +33,7 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.example.thewatchlist.R
 import com.example.thewatchlist.data.navigation.MainNavOption
-import com.example.thewatchlist.network.SearchStatus
+import com.example.thewatchlist.data.SearchStatus
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.components.Banner
 
@@ -144,7 +143,7 @@ fun SearchResults(
     LazyColumn {
         item { Spacer(modifier = Modifier.padding(top = 70.dp)) }
         item {
-            when (val res = dataViewModel.searchStatus) {
+            when (dataViewModel.searchStatus) {
                 is SearchStatus.Success -> {
                     // Display search results as banners
                     dataViewModel.searchResults?.forEach {

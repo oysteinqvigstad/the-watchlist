@@ -3,7 +3,6 @@ package com.example.thewatchlist.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -12,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -34,7 +32,6 @@ import com.example.thewatchlist.ui.theme.KashmirBlue
  * @param mainNavState The ViewModel responsible for managing the state of the main navigation.
  * @param dataViewModel The ViewModel responsible for managing data related to the app.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavController(
     navController: NavHostController = rememberNavController(),

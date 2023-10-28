@@ -110,7 +110,7 @@ fun Banner(
                 )
                 Text(
                     text = media.releaseYear.let { if (it == 0) "TBA" else it.toString() } +
-                            (formatMovieLength(media.runtime)?.let { " \u2022 " + it } ?: "") +
+                            (formatMovieLength(media.runtime)?.let { " \u2022 $it" } ?: "") +
                             if (media is TV) " \u2022 " + media.numberOfEpisodes + " episodes" else ""
 
                     ,

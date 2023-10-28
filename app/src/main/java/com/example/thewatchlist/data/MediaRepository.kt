@@ -18,6 +18,16 @@ interface MediaRepository {
 }
 
 /**
+ * Sealed interface representing the different states of a search operation.
+ */
+sealed interface SearchStatus {
+    object Success: SearchStatus
+    object Loading: SearchStatus
+    object Error: SearchStatus
+    object NoAction: SearchStatus
+}
+
+/**
  * Implementation of the MediaRepository that retrieves data from a network source using the TmdbApi.
  *
  * @param thunk A function that provides an instance of TmdbApi.

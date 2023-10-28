@@ -1,9 +1,7 @@
 package com.example.thewatchlist.ui.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -90,13 +87,11 @@ fun DetailedTopInfo(description: String, map: Map<String, String>) {
 
     Spacer(modifier = Modifier.height(12.dp))
 
-    map.forEach() { data ->
+    map.forEach { data ->
 
         if (data.value.isNotEmpty()) {
 
-            Row(
-                //modifier = Modifier.fillMaxWidth(),
-            ) {
+            Row {
                 Text(
                     text = data.key,
                     textAlign = TextAlign.End,
@@ -200,7 +195,6 @@ fun DetailedTV(
  * @param onCheckmark Callback for handling episode checkmark changes.
  * @param onSeasonCheckmark Callback for handling season checkmark changes.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailedTVSeasons(
     tv: TV,
@@ -286,7 +280,6 @@ fun DetailedTVSeasons(
  * @param season The season for which to display episodes.
  * @param onCheckmark Callback for handling episode checkmark changes.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailedEpisodeList(
     tv: TV,

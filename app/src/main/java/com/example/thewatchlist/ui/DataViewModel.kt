@@ -20,7 +20,7 @@ import com.example.thewatchlist.data.Media
 import com.example.thewatchlist.data.Season
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.TopNavOption
-import com.example.thewatchlist.network.SearchStatus
+import com.example.thewatchlist.data.SearchStatus
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -116,8 +116,8 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
             detailsMediaItem = media
         }
         // Update the media item in search results
-        searchResults?.indexOfFirst { media.id == it.id }?.let { index ->
-            searchResults!![index] = media
+        searchResults?.indexOfFirst { media.id == it.id }?.let {
+            searchResults!![it] = media
 
         }
     }
@@ -193,8 +193,6 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
             Log.d("me", "Ooops")
 
         }
-
-
     }
 
     // companion object is necessary for adding parameters to the View Model constructor
