@@ -15,16 +15,13 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.thewatchlist.WatchlistApplication
 import com.example.thewatchlist.data.Episode
-import com.example.thewatchlist.data.MediaRepository
-import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.Media
+import com.example.thewatchlist.data.MediaRepository
+import com.example.thewatchlist.data.SearchStatus
 import com.example.thewatchlist.data.Season
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.TopNavOption
-import com.example.thewatchlist.data.persistence.MediaDb
 import com.example.thewatchlist.data.persistence.StorageRepository
-import com.example.thewatchlist.network.SearchStatus
-import com.example.thewatchlist.data.SearchStatus
 import kotlinx.coroutines.launch
 import java.io.IOException
 

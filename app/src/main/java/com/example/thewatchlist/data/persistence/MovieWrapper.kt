@@ -1,6 +1,5 @@
 package com.example.thewatchlist.data.persistence
 
-import android.util.Log
 import androidx.room.Entity
 import com.example.thewatchlist.data.Media
 import com.example.thewatchlist.data.Movie
