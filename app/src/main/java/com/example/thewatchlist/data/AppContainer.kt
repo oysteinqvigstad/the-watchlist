@@ -1,8 +1,6 @@
 package com.example.thewatchlist.data
 
-import android.app.Application
-import androidx.room.Room
-import com.example.thewatchlist.data.persistence.StorageDb
+import com.example.thewatchlist.data.persistence.MediaDatabase
 import com.example.thewatchlist.data.persistence.StorageRepository
 import info.movito.themoviedbapi.TmdbApi
 
@@ -11,6 +9,8 @@ import info.movito.themoviedbapi.TmdbApi
  */
 interface AppContainer {
     val mediaRepository: MediaRepository
+    val photoRepository: PhotoRepository
+    val storageRepository: StorageRepository
 }
 
 /**
@@ -26,5 +26,6 @@ class DefaultAppContainer : AppContainer {
     override val mediaRepository: MediaRepository by lazy {
         NetworkMediaRepository { api }
     }
-
+    override val photoRepository = NetworkPhotoRepository()
+    override val storageRepository = StorageRepository(MediaDatabase.getInstance())
 }

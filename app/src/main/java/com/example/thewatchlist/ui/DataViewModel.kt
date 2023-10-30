@@ -16,10 +16,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.thewatchlist.WatchlistApplication
 import com.example.thewatchlist.data.Episode
 import com.example.thewatchlist.data.MediaRepository
+import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.Media
 import com.example.thewatchlist.data.Season
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.TopNavOption
+import com.example.thewatchlist.data.persistence.MediaDb
+import com.example.thewatchlist.data.persistence.StorageRepository
+import com.example.thewatchlist.network.SearchStatus
 import com.example.thewatchlist.data.SearchStatus
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -29,7 +33,10 @@ import java.io.IOException
  *
  * @param mediaRepository The repository used for retrieving and updating media data.
  */
-class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() {
+class DataViewModel(
+    private val mediaRepository: MediaRepository,
+    private val storageRepository: StorageRepository
+) : ViewModel() {
     // Property for tracking the search status
     var searchStatus: SearchStatus by mutableStateOf(SearchStatus.NoAction)
         private set
@@ -44,6 +51,59 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
 
     // List for storing search results
     var searchResults: SnapshotStateList<Media>? = mutableStateListOf()
+
+    init {
+        loadMediaList()
+    }
+
+    // add one or more media entries to the database
+    private fun saveToDb(vararg media: Media) {
+        viewModelScope.launch {
+            Log.d("storage", "Adding ${media.count()} media entries to db.")
+            try {
+                storageRepository.insert(*media)
+            }
+            catch (e: Exception) {
+                Log.e("storage", "Failed to add entries: ${e.message}")
+            }
+        }
+    }
+
+    // update one or more media entries in the database
+    private fun updateDbEntry(vararg media: Media) {
+        viewModelScope.launch {
+            Log.d("storage", "Updating ${media.count()} media entries in db.")
+            try {
+                storageRepository.update(*media)
+            }
+            catch (e: Exception) {
+                Log.e("storage", "Failed to update entries: ${e.message}")
+            }
+        }
+    }
+
+    // remove one or more media entries from the database
+    private fun deleteDbEntry(vararg media: Media) {
+        viewModelScope.launch {
+            Log.d("storage", "Removing ${media.count()} media entries from db.")
+            try {
+                storageRepository.delete(*media)
+            }
+            catch (e: Exception) {
+                Log.e("storage", "Failed to delete entries: ${e.message}")
+            }
+        }
+    }
+
+    // load all items from the database
+    private fun loadMediaList() {
+        viewModelScope.launch {
+            mediaList = SnapshotStateList()
+            mediaList.addAll(storageRepository.getAllMovies())
+            mediaList.addAll(storageRepository.getAllSeries())
+            Log.d("storage", "Loaded ${mediaList.count()} media entries from database.")
+        }
+    }
 
     /**
      * Function to search for media on TMDB based on a given title.
@@ -153,6 +213,13 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
             media.status = tab
             mediaList.add(media)
         }
+
+        // update local database
+        when (tab) {
+            TopNavOption.ToWatch -> saveToDb(media)
+            null -> deleteDbEntry(media)
+            else -> updateDbEntry(media)
+        }
     }
 
     /**
@@ -202,7 +269,8 @@ class DataViewModel(private val mediaRepository: MediaRepository) : ViewModel() 
             initializer {
                 val application = (this[APPLICATION_KEY] as WatchlistApplication)
                 val mediaRepository = application.container.mediaRepository
-                DataViewModel(mediaRepository)
+                val storageRepository = application.container.storageRepository
+                DataViewModel(mediaRepository, storageRepository)
             }
         }
     }

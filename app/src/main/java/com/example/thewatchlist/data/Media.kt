@@ -8,7 +8,7 @@ import info.movito.themoviedbapi.model.tv.TvSeries
 import java.util.Date
 
 
-interface Media {
+interface Media { // make this data class
 
     var status: TopNavOption
     val id: Int
