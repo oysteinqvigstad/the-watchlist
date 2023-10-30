@@ -8,7 +8,7 @@ import info.movito.themoviedbapi.model.tv.TvSeries
 import java.util.Date
 
 
-interface Media {
+interface Media { // make this data class
 
     var status: TopNavOption
     val id: Int
@@ -39,7 +39,6 @@ data class Movie (
         posterUrl =  "https://image.tmdb.org/t/p/w200" + tmdb.posterPath,
         runtime = Pair(tmdb.runtime / 60, tmdb.runtime % 60),
     )
-
 }
 
 data class TV (

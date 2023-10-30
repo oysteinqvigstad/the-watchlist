@@ -17,13 +17,13 @@ import com.example.thewatchlist.ui.theme.TheWatchlistTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             TheWatchlistTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
                     MainNavController()
                 }
             }
