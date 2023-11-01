@@ -225,7 +225,7 @@ fun BannerEpisodeCheck(tv: TV, episode: Episode, dataViewModel: DataViewModel) {
     )
     {
         Text(
-            text = "S"+episode.seasonNumber + "E"+episode.episodeNumber
+            text = String.format("S%02dE%02d", episode.seasonNumber, episode.episodeNumber)
         )
         Checkbox(
             checked = checked,
