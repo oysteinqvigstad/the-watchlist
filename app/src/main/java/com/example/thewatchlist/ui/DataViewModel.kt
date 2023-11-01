@@ -174,8 +174,9 @@ class DataViewModel(
         }
         // Update the media item in search results
         searchResults?.indexOfFirst { media.id == it.id }?.let {
-            searchResults!![it] = media
-
+            if (it != -1) {
+                searchResults!![it] = media
+            }
         }
     }
 
