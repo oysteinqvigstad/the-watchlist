@@ -178,6 +178,9 @@ class DataViewModel(
                 searchResults!![it] = media
             }
         }
+
+        // update media entry in database
+        updateDbEntry(media)
     }
 
     /**
