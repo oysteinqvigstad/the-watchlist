@@ -4,9 +4,12 @@ import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -21,8 +24,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -79,43 +85,58 @@ fun SearchField(
     var active by remember { mutableStateOf(false) }
 
     // Create a search bar with various properties and icons
-    SearchBar(
-        modifier = Modifier.fillMaxWidth(),
-        query = text,
-        onQueryChange = { text = it },
-        onSearch = {
-            searchValue(text)
-            active = false
-        },
-        shadowElevation = 10.dp,
-        active = active,
-        onActiveChange = { active = it },
-        placeholder = { Text(text = "Search") },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search Icon"
-            )
-        },
-        trailingIcon = {
-            if (active) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        SearchBar(
+            modifier = Modifier.fillMaxWidth(),
+            query = text,
+            onQueryChange = { text = it },
+            onSearch = {
+                searchValue(text)
+                active = false
+            },
+            shadowElevation = 10.dp,
+            active = active,
+            onActiveChange = { active = it },
+            placeholder = { Text(text = "Search") },
+            leadingIcon = {
                 Icon(
-                    modifier = Modifier.clickable {
-                        if (text.isNotEmpty()) {
-                            text = ""
-                        } else {
-                            active = false
-                        }
-                    },
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Close Icon"
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search Icon"
                 )
-            }
-        },
+            },
+            trailingIcon = {
+                if (active) {
+                    Icon(
+                        modifier = Modifier.clickable {
+                            if (text.isNotEmpty()) {
+                                text = ""
+                            } else {
+                                active = false
+                            }
+                        },
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close Icon"
+                    )
+                }
+            },
 
-        ) {
+            ) {
+
+
+        }
+
+        Spacer(modifier = Modifier.padding(bottom = 150.dp))
+
+        Image(painter = painterResource(id = R.drawable.searchpic),
+            contentDescription = "Searching picture",
+            alignment = Alignment.BottomCenter,
+            modifier = Modifier
+                .width(200.dp)
+                .height(160.dp)
+        )
 
     }
+
 }
 
 /**
