@@ -35,6 +35,9 @@ import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.ui.DataViewModel
+import com.example.thewatchlist.ui.screens.ErrorMessage
+import com.example.thewatchlist.ui.screens.LoadingIndicator
+import com.example.thewatchlist.ui.screens.SearchScreen
 import com.example.thewatchlist.ui.theme.KashmirBlue
 import com.example.thewatchlist.ui.theme.RemoveColor
 
@@ -76,10 +79,10 @@ fun Banner(
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
 
-            Box {
+            Box (modifier = Modifier.width(110.dp).fillMaxHeight()){
                 // Display loading text or the media item image
                 if (painter.state is AsyncImagePainter.State.Loading) {
-                    Text(text = "Image loading...")
+                    LoadingIndicator()
                 } else {
                     Image(
                         painter = painter,
@@ -88,8 +91,6 @@ fun Banner(
                             .width(110.dp)
                             .fillMaxHeight()
                             .clip(MaterialTheme.shapes.medium),
-
-
                         contentDescription = "Film poster"
                     )
                 }

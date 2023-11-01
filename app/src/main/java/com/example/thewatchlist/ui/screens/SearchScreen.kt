@@ -13,8 +13,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.ImageLoader
@@ -32,8 +33,8 @@ import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.thewatchlist.R
-import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.SearchStatus
+import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.components.Banner
 
@@ -205,5 +206,11 @@ fun LoadingIndicator() {
 @Composable
 fun ErrorMessage() {
 //     TODO: handle better error messages
-    Text(text = "something went wrong")
+    Text(
+        text = "Something went wrong when trying to fetch the data." +
+                "Please check your network connection or try again later.",
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+        )
 }
