@@ -181,6 +181,14 @@ class DataViewModel(
     }
 
     /**
+     *  Function to get the next unwatched episode
+     */
+    fun getNextUnwatchedEpisode(tv: TV): Episode? {
+        return tv.seasons.flatMap { it.episodes }
+            .firstOrNull { it.seasonNumber > 0 && !it.seen }
+    }
+
+    /**
      * Function to set the currently active details media item.
      *
      * @param media The media item to set as the active details item.
