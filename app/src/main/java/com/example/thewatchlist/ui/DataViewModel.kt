@@ -112,7 +112,7 @@ class DataViewModel(
         viewModelScope.launch {
             searchStatus = try {
                 searchResults = mediaRepository.getMultiMedia(title)?.toMutableStateList()
-                SearchStatus.Success
+                if (searchResults != null) SearchStatus.Success else SearchStatus.Error
             } catch (e: IOException) {
                 SearchStatus.Error
             } catch (e: NullPointerException) {
@@ -174,9 +174,21 @@ class DataViewModel(
         }
         // Update the media item in search results
         searchResults?.indexOfFirst { media.id == it.id }?.let {
-            searchResults!![it] = media
-
+            if (it != -1) {
+                searchResults!![it] = media
+            }
         }
+
+        // update media entry in database
+        updateDbEntry(media)
+    }
+
+    /**
+     *  Function to get the next unwatched episode
+     */
+    fun getNextUnwatchedEpisode(tv: TV): Episode? {
+        return tv.seasons.flatMap { it.episodes }
+            .firstOrNull { it.seasonNumber > 0 && !it.seen }
     }
 
     /**
