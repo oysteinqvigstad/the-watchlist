@@ -112,7 +112,7 @@ class DataViewModel(
         viewModelScope.launch {
             searchStatus = try {
                 searchResults = mediaRepository.getMultiMedia(title)?.toMutableStateList()
-                SearchStatus.Success
+                if (searchResults != null) SearchStatus.Success else SearchStatus.Error
             } catch (e: IOException) {
                 SearchStatus.Error
             } catch (e: NullPointerException) {
