@@ -1,8 +1,11 @@
 package com.example.thewatchlist.ui.components
 
 
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,11 +17,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -30,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.example.thewatchlist.data.Episode
 import com.example.thewatchlist.data.Media
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.MainNavOption
@@ -169,7 +175,16 @@ fun BannerPrimaryAction(media: Media, dataViewModel: DataViewModel, activeBottom
         BannerActionButton(media = media, label = "Remove from Watchlist", action = { dataViewModel.moveMediaTo(it, null) }, color = RemoveColor)
     } else if (media is TV && media.status == TopNavOption.ToWatch) {
         BannerActionButton(media = media, label = "Start Watching", action = { dataViewModel.moveMediaTo(it, TopNavOption.Watching) }, color = KashmirBlue)
-    } else {
+    } else if (media is TV && media.status == TopNavOption.Watching) {
+        // Check for next episode to watch
+        var nextEpisode = dataViewModel.getNextUnwatchedEpisode(media)
+        if(nextEpisode!=null) {
+            BannerEpisodeCheck(media, nextEpisode, dataViewModel)
+        } else {    // No more episodes, move to history button
+            BannerActionButton(media = media, label = "Move to History", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, color = RemoveColor)
+        }
+    }
+    else {
         BannerActionButton(media = media, label = "Move to History", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, color = RemoveColor)
     }
 }
@@ -194,6 +209,30 @@ fun BannerActionButton(media: Media, label: String, action: (Media) -> Unit, col
         Text(
             text = label,
             fontSize = 13.sp
+        )
+    }
+}
+
+/**
+ * Function to check off the next episode in a series as watched from the banner.
+ */
+@Composable
+fun BannerEpisodeCheck(tv: TV, episode: Episode, dataViewModel: DataViewModel) {
+    var checked = false
+    Row (
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(bottom = 20.dp)
+    )
+    {
+        Text(
+            text = "S"+episode.seasonNumber + "E"+episode.episodeNumber
+        )
+        Checkbox(
+            checked = checked,
+            onCheckedChange = {
+                checked = !checked;
+                dataViewModel.setEpisodeCheckmark(true, tv, episode)
+            }
         )
     }
 }
