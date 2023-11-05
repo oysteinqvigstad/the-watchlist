@@ -14,13 +14,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
@@ -105,7 +118,8 @@ fun Banner(
             }
             // Display media details in a column
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp)
             ) {
                 TitleHeader(title = media.title)
@@ -189,12 +203,16 @@ fun NextEpisodeInfo(episode: Episode?, onCheckbox: () -> Unit) {
             }
             Button(
                 onClick = { onCheckbox() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = KashmirBlue
-                ),
-                modifier = Modifier.padding(top = 13.dp).height(35.dp)
+                modifier = Modifier
+                    .padding(top = 13.dp)
+                    .height(35.dp)
+
             ) {
-                Text(text = "Seen it!", fontSize = 13.sp)
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = "Done checkmark"
+                )
+                Text(text = "Seen it!", modifier = Modifier.padding(start = 5.dp))
             }
 
         }
@@ -243,32 +261,57 @@ fun formatMovieLength(time: Pair<Int, Int>): String? {
 @Composable
 fun BannerPrimaryAction(media: Media, dataViewModel: DataViewModel, activeBottomNav: MainNavOption) {
     // Determine and display the appropriate action button based on the active bottom navigation and media status
-    if (activeBottomNav == MainNavOption.Search) {
-        if (dataViewModel.isInWatchlist(media)) {
-            BannerActionButton(media = media, label = "Remove from Watchlist", action = { dataViewModel.moveMediaTo(it, null) }, color = RemoveColor)
-        } else {
-            BannerActionButton(media = media, label = "Add to Watchlist", action = { dataViewModel.moveMediaTo(it, TopNavOption.ToWatch) }, color = KashmirBlue)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End
+    ) {
+
+        if (activeBottomNav == MainNavOption.Search) {
+            if (dataViewModel.isInWatchlist(media)) {
+                BannerActionButton(media = media, label = "Remove", action = { dataViewModel.moveMediaTo(it, null) }, color = RemoveColor, icon = Icons.Filled.Clear)
+            } else {
+                BannerActionButton(media = media, label = "Add to Watchlist", action = { dataViewModel.moveMediaTo(it, TopNavOption.ToWatch) }, icon = Icons.Filled.Add)
+            }
+        } else if (media.status == TopNavOption.History) {
+            BannerActionButton(media = media, label = "Delete", action = { dataViewModel.moveMediaTo(it, null) }, color = RemoveColor, icon = Icons.Filled.Clear)
+        } else if (media is TV && media.status == TopNavOption.ToWatch) {
+            BannerActionButton(media = media, label = "Start Tracking", action = { dataViewModel.moveMediaTo(it, TopNavOption.Watching) }, icon = Icons.Filled.PlayArrow)
+        } else if (media is TV && media.status == TopNavOption.Watching) {
+            // Check for next episode to watch
+            val nextEpisode = dataViewModel.getNextUnwatchedEpisode(media)
+            if(nextEpisode!=null) {
+                NextEpisodeInfo(
+                    episode = nextEpisode,
+                    onCheckbox = {dataViewModel.setEpisodeCheckmark(true, media, nextEpisode) }
+                )
+            } else {    // No more episodes, move to history button
+                BannerActionButton(media = media, label = "Seen it!", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, icon = Icons.Filled.Done)
+            }
         }
-    } else if (media.status == TopNavOption.History) {
-        BannerActionButton(media = media, label = "Remove from Watchlist", action = { dataViewModel.moveMediaTo(it, null) }, color = RemoveColor)
-    } else if (media is TV && media.status == TopNavOption.ToWatch) {
-        BannerActionButton(media = media, label = "Start Watching", action = { dataViewModel.moveMediaTo(it, TopNavOption.Watching) }, color = KashmirBlue)
-    } else if (media is TV && media.status == TopNavOption.Watching) {
-        // Check for next episode to watch
-        val nextEpisode = dataViewModel.getNextUnwatchedEpisode(media)
-        if(nextEpisode!=null) {
-            NextEpisodeInfo(
-                episode = nextEpisode,
-                onCheckbox = {dataViewModel.setEpisodeCheckmark(true, media, nextEpisode) }
-            )
-        } else {    // No more episodes, move to history button
-            BannerActionButton(media = media, label = "Seen it!", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, color = KashmirBlue)
+        else {
+            BannerActionButton(media = media, label = "Seen it!", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, icon = Icons.Filled.Done)
         }
-    }
-    else {
-        BannerActionButton(media = media, label = "Seen it!", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, color = KashmirBlue)
+
     }
 }
+
+@Composable
+fun AddButton(
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = { onClick() },
+        modifier = Modifier.padding(top = 13.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Add,
+            contentDescription = "Add media"
+
+        )
+    }
+}
+
+
 
 /**
  * Composable function to display an action button in the banner.
@@ -279,9 +322,18 @@ fun BannerPrimaryAction(media: Media, dataViewModel: DataViewModel, activeBottom
  * @param color The color for the action button.
  */
 @Composable
-fun BannerActionButton(media: Media, label: String, action: (Media) -> Unit, color: Color) {
+fun BannerActionButton(
+    media: Media,
+    label: String,
+    action: (Media) -> Unit,
+    color: Color = KashmirBlue,
+    icon: ImageVector? = null
+) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 15.dp),
+
         horizontalArrangement = Arrangement.End
     ) {
         Button(
@@ -290,9 +342,15 @@ fun BannerActionButton(media: Media, label: String, action: (Media) -> Unit, col
             modifier = Modifier
                 .height(35.dp)
         ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    modifier = Modifier.padding(end = 5.dp)
+                )
+            }
             Text(
                 text = label,
-                fontSize = 13.sp
             )
         }
     }
