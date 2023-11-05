@@ -183,9 +183,9 @@ fun SearchResults(
                     modifier = Modifier.fillParentMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    when (dataViewModel.searchStatus) {
+                    when (val status = dataViewModel.searchStatus) {
                         is SearchStatus.Loading -> LoadingIndicator()
-                        is SearchStatus.Error -> ErrorMessage()
+                        is SearchStatus.Error -> ErrorMessage(status.message)
                         else -> IdleContent()
                     }
                 }
@@ -229,14 +229,12 @@ fun LoadingIndicator() {
  * Composable function to display an error message.
  */
 @Composable
-fun ErrorMessage() {
-//     TODO: handle better error messages
+fun ErrorMessage(message: String) {
     Text(
-        text = "Something went wrong when trying to fetch the data." +
-                "Please check your network connection or try again later.",
+        text = message,
         textAlign = TextAlign.Center,
         modifier = Modifier
-            .fillMaxWidth()
+            .widthIn(max = 300.dp)
         )
 }
 
@@ -259,7 +257,9 @@ fun IdleContent() {
         Text(
             text = "Use search bar to look up TV or movie information",
             textAlign = TextAlign.Center,
-            modifier = Modifier.widthIn(max = 200.dp).padding(top = 30.dp)
+            modifier = Modifier
+                .widthIn(max = 200.dp)
+                .padding(top = 30.dp)
         )
 
     }

@@ -23,7 +23,7 @@ interface MediaRepository {
 sealed interface SearchStatus {
     object Success: SearchStatus
     object Loading: SearchStatus
-    object Error: SearchStatus
+    class Error(val message: String): SearchStatus
     object NoAction: SearchStatus
 }
 
@@ -73,7 +73,6 @@ class NetworkMediaRepository(thunk: () -> TmdbApi) : MediaRepository {
             try {
                 TV(api.tvSeries.getSeries(seriesId, "en"))
             } catch (e: Exception) {
-                Log.d("me", "something wrong?")
                 null
             }
         }
@@ -92,7 +91,6 @@ class NetworkMediaRepository(thunk: () -> TmdbApi) : MediaRepository {
             try {
                 api.tvSeasons.getSeason(seriesId, seasonId, "en").episodes.map { Episode(it) }
             } catch (e: Exception) {
-                Log.d("me", "something wrong?")
                 null
             }
         }

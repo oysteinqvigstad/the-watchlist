@@ -112,11 +112,20 @@ class DataViewModel(
         viewModelScope.launch {
             searchStatus = try {
                 searchResults = mediaRepository.getMultiMedia(title)?.toMutableStateList()
-                if (searchResults != null) SearchStatus.Success else SearchStatus.Error
+                when {
+                    searchResults.isNullOrEmpty() -> {
+                        if (searchResults == null) {
+                            SearchStatus.Error("Could not reach the remote server. Please verify your network connection")
+                        } else {
+                            SearchStatus.Error("Could not find the movie or show you are looking for. Please check for spelling errors in search terms")
+                        }
+                    }
+                    else -> SearchStatus.Success
+                }
             } catch (e: IOException) {
-                SearchStatus.Error
+                SearchStatus.Error("Unexpected response from remote server. Please try again later")
             } catch (e: NullPointerException) {
-                SearchStatus.Error
+                SearchStatus.Error("Unexpected error")
             }
         }
     }
@@ -246,7 +255,7 @@ class DataViewModel(
             }
             updateMediaEntry(tv)
         } catch (e: Exception) {
-            Log.d("me", "Ooops")
+            Log.d("app", "failed to update season information")
         }
     }
 
@@ -266,7 +275,7 @@ class DataViewModel(
             })
             updateMediaEntry(newTv)
         } catch (e: Exception) {
-            Log.d("me", "Ooops")
+            Log.d("app", "failed to update episode information")
 
         }
     }
