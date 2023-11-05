@@ -2,6 +2,7 @@ package com.example.thewatchlist.ui.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -44,25 +45,25 @@ fun MovieScreen(
             topNavItems = mainNavState.topNavMovieItems,
             onClick = { mainNavState.setMovieNavItem(it) })
 
-        // Iterate through media items in the watchlist
-        dataViewModel.mediaList.forEach {
-            // Check if the item is a movie and its status matches the active top navigation item
-            if (it is Movie && it.status == mainNavState.activeMovieNavItem) {
-                // Display a banner for the movie
-                Banner(
-                    media = it,
-                    activeBottomNav = MainNavOption.Movies,
-                    onDetails = {
-                        dataViewModel.setActiveDetailsMediaItem(it)
-                        mainNavController.navigate("details")
-                    },
-                    dataViewModel = dataViewModel
-
-                )
-        } }
-
-
+        LazyColumn {
+            // Iterate through media items in the watchlist
+            dataViewModel.mediaList.forEach {
+                // Check if the item is a movie and its status matches the active top navigation item
+                if (it is Movie && it.status == mainNavState.activeMovieNavItem) {
+                    // Display a banner for the movie
+                    item {
+                        Banner(
+                            media = it,
+                            activeBottomNav = MainNavOption.Movies,
+                            onDetails = {
+                                dataViewModel.setActiveDetailsMediaItem(it)
+                                mainNavController.navigate("details")
+                            },
+                            dataViewModel = dataViewModel
+                        )
+                    }
+                }
+            }
+        }
     }
-    
-    
 }
