@@ -65,7 +65,8 @@ fun Banner(
 
     LaunchedEffect(Unit) {
         if (media is TV) {
-            dataViewModel.updateEpisodes(media)
+            dataViewModel.updateTVShow(media)
+//            dataViewModel.updateEpisodes(media)
         }
     }
 

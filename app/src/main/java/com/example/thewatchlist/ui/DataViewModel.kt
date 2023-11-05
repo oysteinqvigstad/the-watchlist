@@ -24,6 +24,9 @@ import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.data.persistence.StorageRepository
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.util.Date
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * ViewModel class responsible for managing data and interactions with the media repository.
@@ -241,11 +244,28 @@ class DataViewModel(
     }
 
     /**
+     * Function to trigger update of season info and episodes if more than 12 hours have passed
+     * since last update
+     */
+    suspend fun updateTVShow(tv: TV) {
+        val timeSinceLast = (System.currentTimeMillis() - tv.lastUpdated.time).milliseconds
+        if (timeSinceLast > 12.hours) {
+            Log.d("me", "time to update ${tv.title}")
+            updateSeasonInfo(tv)
+            updateEpisodes(tv)
+            tv.lastUpdated = Date()
+        } else {
+            Log.d("me", "no need to update ${tv.title}, last update $timeSinceLast")
+        }
+    }
+
+
+    /**
      * Function to update season information for a TV series.
      *
      * @param tv The TV series to update.
      */
-    suspend fun updateSeasonInfo(tv: TV) {
+    private suspend fun updateSeasonInfo(tv: TV) {
         try {
             val downloadedShow = mediaRepository.getSeries(tv.id)
             downloadedShow?.seasons?.forEach { season ->
@@ -264,7 +284,7 @@ class DataViewModel(
      *
      * @param tv The TV series to update.
      */
-    suspend fun updateEpisodes(tv: TV) {
+    private suspend fun updateEpisodes(tv: TV) {
         try {
             val newTv = tv.copy(seasons = tv.seasons.map { season ->
                 mediaRepository.getEpisodes(tv.id, season.seasonNumber)!!.let { episodes ->

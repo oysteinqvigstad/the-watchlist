@@ -35,8 +35,7 @@ fun DetailScreen(
     // Use LaunchedEffect to trigger updates for TV series if the media is of type TV
     LaunchedEffect(Unit) {
         if (media is TV) {
-            dataViewModel.updateSeasonInfo(media)
-            dataViewModel.updateEpisodes(media)
+            dataViewModel.updateTVShow(media)
         }
     }
 
