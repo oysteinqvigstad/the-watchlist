@@ -3,10 +3,15 @@ package com.example.thewatchlist.ui.screens
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.navigation.MainNavOption
@@ -14,6 +19,7 @@ import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.MainNavState
 import com.example.thewatchlist.ui.TabNavigation
 import com.example.thewatchlist.ui.components.Banner
+import com.example.thewatchlist.ui.shareContent
 
 /**
  * Composable function representing the movie screen.
@@ -32,11 +38,26 @@ fun MovieScreen(
     dataViewModel: DataViewModel,
     title: String
 ) {
+    val context = LocalContext.current
+    val mediaItems = dataViewModel.mediaList.filter {
+        it is Movie && it.status == mainNavState.activeMovieNavItem
+    }
     // Create a column layout to contain the top app bar, tab navigation, and movie banners
     Column {
         // Display a centered top app bar with the given title
         CenterAlignedTopAppBar(
-            title = { Text(title) }
+            title = { Text(title) },
+            actions = {
+                IconButton(
+                    onClick = {
+                        shareContent(
+                            context = context,
+                            textToShare = mediaItems.joinToString("\n") { it.title }
+                        )
+                    }) {
+                    Icon(Icons.Filled.Share, contentDescription = "Share")
+                }
+            }
         )
 
         // Create a tab navigation bar for switching between top navigation options
@@ -46,22 +67,18 @@ fun MovieScreen(
             onClick = { mainNavState.setMovieNavItem(it) })
 
         LazyColumn {
-            // Iterate through media items in the watchlist
-            dataViewModel.mediaList.forEach {
-                // Check if the item is a movie and its status matches the active top navigation item
-                if (it is Movie && it.status == mainNavState.activeMovieNavItem) {
-                    // Display a banner for the movie
-                    item {
-                        Banner(
-                            media = it,
-                            activeBottomNav = MainNavOption.Movies,
-                            onDetails = {
-                                dataViewModel.setActiveDetailsMediaItem(it)
-                                mainNavController.navigate("details")
-                            },
-                            dataViewModel = dataViewModel
-                        )
-                    }
+            mediaItems.forEach {
+            // Display a banner for the movie
+                item {
+                    Banner(
+                        media = it,
+                        activeBottomNav = MainNavOption.Movies,
+                        onDetails = {
+                            dataViewModel.setActiveDetailsMediaItem(it)
+                            mainNavController.navigate("details")
+                        },
+                        dataViewModel = dataViewModel
+                    )
                 }
             }
         }

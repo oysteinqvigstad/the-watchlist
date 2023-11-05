@@ -1,9 +1,7 @@
 package com.example.thewatchlist.ui.components
 
 
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,14 +9,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,11 +42,10 @@ import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.ui.DataViewModel
-import com.example.thewatchlist.ui.screens.ErrorMessage
 import com.example.thewatchlist.ui.screens.LoadingIndicator
-import com.example.thewatchlist.ui.screens.SearchScreen
 import com.example.thewatchlist.ui.theme.KashmirBlue
 import com.example.thewatchlist.ui.theme.RemoveColor
+import info.movito.themoviedbapi.model.Genre
 
 /**
  * Composable function to display a banner for a media item with details.
@@ -66,7 +66,6 @@ fun Banner(
     LaunchedEffect(Unit) {
         if (media is TV) {
             dataViewModel.updateTVShow(media)
-//            dataViewModel.updateEpisodes(media)
         }
     }
 
@@ -86,7 +85,9 @@ fun Banner(
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
 
-            Box (modifier = Modifier.width(110.dp).fillMaxHeight()){
+            Box (modifier = Modifier
+                .width(110.dp)
+                .fillMaxHeight()){
                 // Display loading text or the media item image
                 if (painter.state is AsyncImagePainter.State.Loading) {
                     LoadingIndicator()
@@ -102,45 +103,121 @@ fun Banner(
                     )
                 }
             }
-
             // Display media details in a column
-            Column(modifier = Modifier
-                .padding(start = 20.dp, end = 20.dp)
+            Column(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp)
             ) {
+                TitleHeader(title = media.title)
 
-                Text(
-                    text = media.title,
-                    fontSize = 18.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .padding(top = 10.dp, bottom = 5.dp)
-                )
-                Text(
-                    text = media.releaseYear.let { if (it == 0) "TBA" else it.toString() } +
-                            (formatMovieLength(media.runtime)?.let { " \u2022 $it" } ?: "") +
-                            if (media is TV) " \u2022 " + media.numberOfEpisodes + " episodes" else ""
-
-                    ,
-                    fontSize = 12.sp,
-                )
-
-                Text(text = media.genres.take(3).joinToString(", ") { it.name },
-                    fontSize = 12.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Spacer(modifier = Modifier.padding(top = 25.dp))
+                if (media is TV && activeBottomNav != MainNavOption.Search) {
+                    val nextEpisode = dataViewModel.getNextUnwatchedEpisode(media)
+                    ProgressBarRemainingEpisodes(media)
+                } else {
+                    BriefInfoText(media = media)
+                    GenresText(genres = media.genres)
+                }
 
                 // Display primary action button based on the active bottom navigation and media status
                 BannerPrimaryAction(media = media, activeBottomNav = activeBottomNav, dataViewModel = dataViewModel)
-
             }
+
         }
 
     }
 }
 
+/**
+ *  Composable function for displaying the title header
+ */
+@Composable
+fun TitleHeader(title: String) {
+    Text(
+        text = title,
+        fontSize = 18.sp,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier
+            .padding(top = 10.dp, bottom = 5.dp)
+    )
+}
+
+@Composable
+fun GenresText(genres: List<Genre>) {
+    Text(text = genres.take(3).joinToString(", ") { it.name },
+        fontSize = 12.sp,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
+}
+
+@Composable
+fun BriefInfoText(media: Media) {
+    Text(
+        text = media.releaseYear.let { if (it == 0) "TBA" else it.toString() } +
+                (formatMovieLength(media.runtime)?.let { " \u2022 $it" } ?: "") +
+                if (media is TV) " \u2022 " + media.numberOfEpisodes + " episodes" else ""
+        ,
+        fontSize = 12.sp,
+    )
+}
+
+@Composable
+fun NextEpisodeInfo(episode: Episode?, onCheckbox: () -> Unit) {
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        if (episode != null) {
+            Column {
+                Text(
+                    text = "Next episode",
+                    fontSize = 12.sp
+                )
+
+                Text(
+                    text = String.format(
+                        "S%02dE%02d",
+                        episode.seasonNumber,
+                        episode.episodeNumber,
+                    ),
+                )
+            }
+            Button(
+                onClick = { onCheckbox() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = KashmirBlue
+                ),
+                modifier = Modifier.padding(top = 13.dp).height(35.dp)
+            ) {
+                Text(text = "Seen it!", fontSize = 13.sp)
+            }
+
+        }
+    }
+}
+
+
+
+@Composable
+fun ProgressBarRemainingEpisodes(tv: TV) {
+    // get number of episodes that are not specials
+    val seen = tv.seasons.flatMap { it.episodes }.count { it.seasonNumber > 0 && it.seen }
+    val total = tv.seasons.flatMap { it.episodes }.count { it.seasonNumber > 0 }
+
+    Text(
+        text = "${total - seen} unwatched episodes",
+        fontSize = 12.sp,
+    )
+    LinearProgressIndicator(
+        progress = seen.toFloat() / total.toFloat(),
+        modifier = Modifier.padding(top = 6.dp, bottom = 6.dp)
+    )
+}
 
 
 /**
@@ -178,15 +255,18 @@ fun BannerPrimaryAction(media: Media, dataViewModel: DataViewModel, activeBottom
         BannerActionButton(media = media, label = "Start Watching", action = { dataViewModel.moveMediaTo(it, TopNavOption.Watching) }, color = KashmirBlue)
     } else if (media is TV && media.status == TopNavOption.Watching) {
         // Check for next episode to watch
-        var nextEpisode = dataViewModel.getNextUnwatchedEpisode(media)
+        val nextEpisode = dataViewModel.getNextUnwatchedEpisode(media)
         if(nextEpisode!=null) {
-            BannerEpisodeCheck(media, nextEpisode, dataViewModel)
+            NextEpisodeInfo(
+                episode = nextEpisode,
+                onCheckbox = {dataViewModel.setEpisodeCheckmark(true, media, nextEpisode) }
+            )
         } else {    // No more episodes, move to history button
-            BannerActionButton(media = media, label = "Move to History", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, color = RemoveColor)
+            BannerActionButton(media = media, label = "Seen it!", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, color = KashmirBlue)
         }
     }
     else {
-        BannerActionButton(media = media, label = "Move to History", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, color = RemoveColor)
+        BannerActionButton(media = media, label = "Seen it!", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, color = KashmirBlue)
     }
 }
 
@@ -200,40 +280,21 @@ fun BannerPrimaryAction(media: Media, dataViewModel: DataViewModel, activeBottom
  */
 @Composable
 fun BannerActionButton(media: Media, label: String, action: (Media) -> Unit, color: Color) {
-    Button(
-        onClick = { action(media) },
-        colors = ButtonDefaults.buttonColors(color),
-        modifier = Modifier
-            .height(35.dp)
-            .padding(start = 20.dp)
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
+        horizontalArrangement = Arrangement.End
     ) {
-        Text(
-            text = label,
-            fontSize = 13.sp
-        )
+        Button(
+            onClick = { action(media) },
+            colors = ButtonDefaults.buttonColors(color),
+            modifier = Modifier
+                .height(35.dp)
+        ) {
+            Text(
+                text = label,
+                fontSize = 13.sp
+            )
+        }
     }
-}
 
-/**
- * Function to check off the next episode in a series as watched from the banner.
- */
-@Composable
-fun BannerEpisodeCheck(tv: TV, episode: Episode, dataViewModel: DataViewModel) {
-    var checked = false
-    Row (
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(bottom = 20.dp)
-    )
-    {
-        Text(
-            text = String.format("S%02dE%02d", episode.seasonNumber, episode.episodeNumber)
-        )
-        Checkbox(
-            checked = checked,
-            onCheckedChange = {
-                checked = !checked;
-                dataViewModel.setEpisodeCheckmark(true, tv, episode)
-            }
-        )
-    }
 }

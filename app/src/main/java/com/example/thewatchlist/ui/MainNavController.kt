@@ -1,8 +1,12 @@
 package com.example.thewatchlist.ui
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -11,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -32,12 +37,14 @@ import com.example.thewatchlist.ui.theme.KashmirBlue
  * @param mainNavState The ViewModel responsible for managing the state of the main navigation.
  * @param dataViewModel The ViewModel responsible for managing data related to the app.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavController(
     navController: NavHostController = rememberNavController(),
     mainNavState: MainNavState = viewModel(),
     dataViewModel: DataViewModel = viewModel(factory = DataViewModel.Factory)
 ) {
+    val context = LocalContext.current
     // Get the active menu item from the mainNavState ViewModel
     val activeMenuItem = mainNavState.activeMainNavItem
 
@@ -141,4 +148,13 @@ fun TabNavigation(
             )
         }
     }
+}
+
+fun shareContent(context: Context, textToShare: String) {
+    val shareIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, textToShare)
+        type = "text/plain"
+    }
+    context.startActivity(Intent.createChooser(shareIntent, null))
 }
