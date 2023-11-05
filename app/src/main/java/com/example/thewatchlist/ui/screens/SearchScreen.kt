@@ -1,15 +1,19 @@
 package com.example.thewatchlist.ui.screens
 
 import android.os.Build
+import android.os.MessageQueue.IdleHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -60,12 +64,13 @@ fun SearchScreen(
 
     // Create a box layout to contain the search field and search results
     Box {
-        SearchField(searchValue = {searchText = it})
         SearchResults(
             dataViewModel = dataViewModel,
             mainNavController = mainNavController,
             searchText = searchText
         )
+        SearchField(searchValue = {searchText = it})
+
 
     }
 }
@@ -122,18 +127,7 @@ fun SearchField(
 
             ) {
 
-
         }
-
-        Spacer(modifier = Modifier.padding(bottom = 150.dp))
-
-        Image(painter = painterResource(id = R.drawable.searchpic),
-            contentDescription = "Searching picture",
-            alignment = Alignment.BottomCenter,
-            modifier = Modifier
-                .width(200.dp)
-                .height(160.dp)
-        )
 
     }
 
@@ -162,29 +156,39 @@ fun SearchResults(
     }
 
     // Create a LazyColumn for displaying search results
-    LazyColumn {
+    LazyColumn(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         item { Spacer(modifier = Modifier.padding(top = 70.dp)) }
-        item {
-            when (dataViewModel.searchStatus) {
-                is SearchStatus.Success -> {
-                    // Display search results as banners
-                    dataViewModel.searchResults?.forEach {
-                        Banner(
-                            media = it,
-                            activeBottomNav = MainNavOption.Search,
-                            onDetails = {
-                                dataViewModel.setActiveDetailsMediaItem(it)
-                                mainNavController.navigate("details")
-                            },
-                            dataViewModel = dataViewModel
 
-                        )
+        // Display search results as banners
+        if (dataViewModel.searchStatus == SearchStatus.Success) {
+            dataViewModel.searchResults?.forEach {
+                item {
+                    Banner(
+                        media = it,
+                        activeBottomNav = MainNavOption.Search,
+                        onDetails = {
+                            dataViewModel.setActiveDetailsMediaItem(it)
+                            mainNavController.navigate("details")
+                        },
+                        dataViewModel = dataViewModel
+                    )
+                }
+            }
+        } else {
+            // set placeholder content if no content has loaded
+            item {
+                Box(
+                    modifier = Modifier.fillParentMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    when (dataViewModel.searchStatus) {
+                        is SearchStatus.Loading -> LoadingIndicator()
+                        is SearchStatus.Error -> ErrorMessage()
+                        else -> IdleContent()
                     }
                 }
-
-                is SearchStatus.Loading -> LoadingIndicator()
-                is SearchStatus.Error -> ErrorMessage()
-                is SearchStatus.NoAction -> {}
             }
         }
     }
@@ -234,4 +238,30 @@ fun ErrorMessage() {
         modifier = Modifier
             .fillMaxWidth()
         )
+}
+
+/**
+ * Composable function that displays a cat with magnifying glass
+ */
+@Composable
+fun IdleContent() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.searchpic),
+            contentDescription = "Searching picture",
+            modifier = Modifier
+                .width(200.dp)
+                .height(160.dp)
+
+        )
+        Text(
+            text = "Use search bar to look up TV or movie information",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.widthIn(max = 200.dp).padding(top = 30.dp)
+        )
+
+    }
+
 }
