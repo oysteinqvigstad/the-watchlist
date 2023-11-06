@@ -9,39 +9,30 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -51,18 +42,14 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.example.thewatchlist.data.Episode
 import com.example.thewatchlist.data.Media
-import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.screens.LoadingIndicator
 import com.example.thewatchlist.ui.theme.KashmirBlue
-import com.example.thewatchlist.ui.theme.RemoveColor
 import info.movito.themoviedbapi.model.Genre
-import kotlinx.coroutines.delay
 
 /**
  * Composable function to display a banner for a media item with details.
@@ -129,7 +116,6 @@ fun Banner(
                 TitleHeader(title = media.title)
 
                 if (media is TV && activeBottomNav != MainNavOption.Search) {
-                    val nextEpisode = dataViewModel.getNextUnwatchedEpisode(media)
                     ProgressBarRemainingEpisodes(media)
                 } else {
                     BriefInfoText(media = media)
@@ -180,51 +166,9 @@ fun BriefInfoText(media: Media) {
     )
 }
 
-@Composable
-fun NextEpisodeInfo(episode: Episode?, onCheckbox: () -> Unit) {
-
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        if (episode != null) {
-            Column {
-                Text(
-                    text = "Next episode",
-                    fontSize = 12.sp
-                )
-
-                Text(
-                    text = String.format(
-                        "S%02dE%02d",
-                        episode.seasonNumber,
-                        episode.episodeNumber,
-                    ),
-                )
-            }
-            Button(
-                onClick = { onCheckbox() },
-                modifier = Modifier
-                    .padding(top = 13.dp)
-                    .height(35.dp)
-
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Done,
-                    contentDescription = "Done checkmark"
-                )
-                Text(text = "Seen it!", modifier = Modifier.padding(start = 5.dp))
-            }
-
-        }
-    }
-}
-
-
-
+/**
+ * Composable function that displays a progress bar of episodes seen
+ */
 @Composable
 fun ProgressBarRemainingEpisodes(tv: TV) {
     // get number of episodes that are not specials
@@ -233,11 +177,13 @@ fun ProgressBarRemainingEpisodes(tv: TV) {
 
     Text(
         text = "${total - seen} unwatched episodes",
-        fontSize = 12.sp,
+        fontSize = 13.sp,
+        modifier = Modifier.padding(top = 5.dp)
     )
     LinearProgressIndicator(
         progress = seen.toFloat() / total.toFloat(),
-        modifier = Modifier.padding(top = 6.dp, bottom = 6.dp)
+        modifier = Modifier.padding(top = 6.dp, bottom = 6.dp),
+        color = KashmirBlue
     )
 }
 
@@ -272,90 +218,87 @@ fun BannerPrimaryAction(media: Media, dataViewModel: DataViewModel, activeBottom
 
         if (activeBottomNav == MainNavOption.Search) {
             if (dataViewModel.isInWatchlist(media)) {
-                BannerActionButton(media = media, label = "Remove", action = { dataViewModel.moveMediaTo(it, null) }, color = RemoveColor, icon = Icons.Filled.Clear)
+                BannerButton(icon = Icons.Filled.Star, description = "Remove from watchlist") {
+                    dataViewModel.moveMediaTo(media, null)
+                }
             } else {
-                BannerActionButton(media = media, label = "Add to Watchlist", action = { dataViewModel.moveMediaTo(it, TopNavOption.ToWatch) }, icon = Icons.Filled.Add)
+                BannerButton(icon = Icons.Filled.StarBorder, description = "Add to watchlist") {
+                    dataViewModel.moveMediaTo(media, TopNavOption.ToWatch)
+                }
             }
         } else if (media.status == TopNavOption.History) {
-            BannerActionButton(media = media, action = { dataViewModel.moveMediaTo(it, TopNavOption.ToWatch) }, icon = Icons.Filled.Refresh)
-            Spacer(modifier = Modifier.padding(start = 5.dp))
-            BannerActionButton(media = media, action = { dataViewModel.moveMediaTo(it, null) }, color = RemoveColor, icon = Icons.Filled.Clear)
+            if (media is TV) {
+                BannerButton(icon = Icons.Filled.Refresh, description = "Rewatch") {
+                    dataViewModel.moveMediaTo(media, TopNavOption.ToWatch)
+                }
+                Spacer(modifier = Modifier.padding(start = 5.dp))
+            }
+            BannerButton(icon = Icons.Filled.Delete, description = "delete", onClick = {dataViewModel.moveMediaTo(media, null) })
         } else if (media is TV && media.status == TopNavOption.ToWatch) {
-            BannerActionButton(media = media, label = "Start Tracking", action = { dataViewModel.moveMediaTo(it, TopNavOption.Watching) }, icon = Icons.Filled.PlayArrow)
+            BannerTextButton(icon = Icons.Filled.PlayArrow, label = "Start Tracking") {
+                dataViewModel.moveMediaTo(media, TopNavOption.Watching)
+            }
         } else if (media is TV && media.status == TopNavOption.Watching) {
             // Check for next episode to watch
             val nextEpisode = dataViewModel.getNextUnwatchedEpisode(media)
             if(nextEpisode!=null) {
-                NextEpisodeInfo(
-                    episode = nextEpisode,
-                    onCheckbox = {dataViewModel.setEpisodeCheckmark(true, media, nextEpisode) }
-                )
-            } else {    // No more episodes, move to history button
-                BannerActionButton(media = media, label = "Seen it!", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, icon = Icons.Filled.Done)
+                BannerTextButton(icon = Icons.Filled.Done, label =
+                String.format("S%02dE%02d", nextEpisode.seasonNumber, nextEpisode.episodeNumber)) {
+                    dataViewModel.setEpisodeCheckmark(true, media, nextEpisode)
+                }
+                Spacer(Modifier.weight(1f))
+            }
+
+            BannerButton(icon = Icons.Filled.Inventory, description = "seen it") {
+                dataViewModel.moveMediaTo(media, TopNavOption.History)
             }
         }
         else {
-            BannerActionButton(media = media, label = "Seen it!", action = { dataViewModel.moveMediaTo(it, TopNavOption.History) }, icon = Icons.Filled.Done)
+            BannerButton(icon = Icons.Filled.Check, description = "Seen it", onClick = { dataViewModel.moveMediaTo(media, TopNavOption.History) })
         }
 
     }
 }
 
+/**
+ * Composable function of a button with icon
+ */
 @Composable
-fun AddButton(
+fun BannerButton(
+    icon: ImageVector,
+    description: String,
     onClick: () -> Unit
 ) {
-    IconButton(
+    FilledTonalIconButton(
         onClick = { onClick() },
         modifier = Modifier.padding(top = 13.dp)
     ) {
         Icon(
-            imageVector = Icons.Filled.Add,
-            contentDescription = "Add media"
-
+            imageVector = icon,
+            contentDescription = description,
+            tint = KashmirBlue
         )
     }
 }
 
-
-
 /**
- * Composable function to display an action button in the banner.
- *
- * @param media The media item for which to display the action button.
- * @param label The label for the action button.
- * @param action Callback to handle the action button click.
- * @param color The color for the action button.
+ * Composable function of a button with icon and text label
  */
 @Composable
-fun BannerActionButton(
-    media: Media,
-    label: String = "",
-    action: (Media) -> Unit,
-    color: Color = KashmirBlue,
-    icon: ImageVector? = null
+fun BannerTextButton(
+    icon: ImageVector,
+    label: String,
+    onClick: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .padding(top = 15.dp),
+    FilledTonalButton(
+        onClick = { onClick() },
+        modifier = Modifier.padding(top = 13.dp)
     ) {
-        Button(
-            onClick = { action(media) },
-            colors = ButtonDefaults.buttonColors(color),
-            modifier = Modifier
-                .height(35.dp)
-        ) {
-            if (icon != null) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = label,
-                    modifier = Modifier.padding(end = 5.dp)
-                )
-            }
-            Text(
-                text = label,
-            )
-        }
+        Icon(
+            imageVector = icon,
+            contentDescription = " $label",
+            tint = KashmirBlue
+        )
+        Text(text = label, color = KashmirBlue)
     }
-
 }

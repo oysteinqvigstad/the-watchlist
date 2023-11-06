@@ -246,20 +246,15 @@ class DataViewModel(
         }
     }
 
+    /**
+     * Clear the notify flag on all media entries
+     */
     fun clearNotifications(media: List<Media>) {
         media.forEach {
             it.notify = false
             updateMediaEntry(it)
         }
     }
-
-    fun clearNotification(media: Media) {
-        when (media) {
-            is TV -> updateMediaEntry(media.copy(notify = false))
-            is Movie -> updateMediaEntry(media.copy(notify = false))
-        }
-    }
-
 
     /**
      * Function to trigger update of season info and episodes if more than 12 hours have passed
