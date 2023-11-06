@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.ui.DataViewModel
@@ -64,7 +65,12 @@ fun ShowScreen(
         TabNavigation(
             activeTopNavOption = mainNavState.activeShowNavItem,
             topNavItems = mainNavState.topNavShowsItems,
-            onClick = { mainNavState.setShowNavItem(it) })
+            onClick = {
+                dataViewModel.clearNotifications(mediaItems)
+                mainNavState.setShowNavItem(it)
+            },
+            mediaItems = dataViewModel.mediaList.filter { it is TV }
+        )
 
         LazyColumn {
             // Iterate through media items in the watchlist

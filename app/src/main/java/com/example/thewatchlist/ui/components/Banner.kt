@@ -53,6 +53,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.thewatchlist.data.Episode
 import com.example.thewatchlist.data.Media
+import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
@@ -61,6 +62,7 @@ import com.example.thewatchlist.ui.screens.LoadingIndicator
 import com.example.thewatchlist.ui.theme.KashmirBlue
 import com.example.thewatchlist.ui.theme.RemoveColor
 import info.movito.themoviedbapi.model.Genre
+import kotlinx.coroutines.delay
 
 /**
  * Composable function to display a banner for a media item with details.

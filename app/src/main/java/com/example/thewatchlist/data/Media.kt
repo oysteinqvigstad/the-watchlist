@@ -18,6 +18,7 @@ interface Media { // make this data class
     val releaseYear: Int
     val posterUrl: String
     val runtime: Pair<Int, Int>
+    var notify: Boolean
 }
 
 data class Movie (
@@ -28,7 +29,8 @@ data class Movie (
     override val releaseYear: Int,
     override val posterUrl: String,
     override val runtime: Pair<Int, Int>,
-    override var status: TopNavOption = TopNavOption.ToWatch
+    override var status: TopNavOption = TopNavOption.ToWatch,
+    override var notify: Boolean = false
 ) : Media {
     constructor(tmdb: MovieDb) : this(
         id = tmdb.id,
@@ -50,6 +52,7 @@ data class TV (
     override val runtime: Pair<Int, Int>,
     override var status: TopNavOption = TopNavOption.ToWatch,
     override val posterUrl: String,
+    override var notify: Boolean = false,
     var numberOfEpisodes: Int,
     var seasons: List<Season> = listOf(),
     var lastUpdated: Date = Date(0)

@@ -3,8 +3,14 @@ package com.example.thewatchlist.ui
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.NavigationBar
@@ -15,12 +21,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.thewatchlist.data.Media
+import com.example.thewatchlist.data.Movie
+import com.example.thewatchlist.data.TV
 import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.ui.screens.DetailScreen
@@ -47,6 +59,9 @@ fun MainNavController(
     val context = LocalContext.current
     // Get the active menu item from the mainNavState ViewModel
     val activeMenuItem = mainNavState.activeMainNavItem
+    val moviesNotify = dataViewModel.mediaList.find { it is Movie && it.notify } != null
+    val showsNotify = dataViewModel.mediaList.find { it is TV && it.notify } != null
+
 
     // Create a Scaffold with a bottom and top navigation bar
     Scaffold(
@@ -56,10 +71,22 @@ fun MainNavController(
                 mainNavState.mainNavItems.forEach { item ->
                     NavigationBarItem(
                         icon = {
-                            Image(
-                                painter = painterResource(id = mainNavState.getImageId(item)),
-                                contentDescription = item.mainNavOption.toString(),
-                                modifier = Modifier.size(24.dp)
+                            BadgedBox(
+                                badge = {
+                                    if (item.mainNavOption == MainNavOption.Movies && moviesNotify ||
+                                        item.mainNavOption == MainNavOption.Shows && showsNotify) {
+                                        Box(modifier = Modifier
+                                            .size(8.dp)
+                                            .background(Color.Red, shape = CircleShape))
+                                    }
+                                },
+                                content = {
+                                        Image(
+                                            painter = painterResource(id = mainNavState.getImageId(item)),
+                                            contentDescription = item.mainNavOption.toString(),
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                }
                             )
                         },
                         label = { Text(item.mainNavOption.toString()) },
@@ -127,10 +154,12 @@ fun MainNavController(
  * @param topNavItems A list of top navigation options to display as tabs.
  * @param onClick A callback function to handle tab click events.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TabNavigation(
     activeTopNavOption: TopNavOption = TopNavOption.ToWatch,
     topNavItems: List<TopNavOption>,
+    mediaItems: List<Media>,
     onClick: (TopNavOption) -> Unit = {}
 ) {
     // Create a secondary tab row for displaying the top navigation options
@@ -141,10 +170,25 @@ fun TabNavigation(
     ) {
         // Iterate through the top navigation items to create individual tabs
         topNavItems.forEach { type ->
+            val notify = mediaItems.find { it.status == type && it.notify } != null
+            val count = mediaItems.count { it.status == type }
             Tab(
-                text = { Text(text = type.toString()) },
+                text = {
+                    Row(
+                        verticalAlignment = CenterVertically
+                    ) {
+                        Text(text = type.toString())
+                        Spacer(modifier = Modifier.padding(start = 15.dp))
+                        Badge(
+                            containerColor = if (notify) Color.Red else Color.LightGray,
+                            contentColor = Color.White
+                        ){
+                            Text(text = " $count ")
+                        }
+                    }
+               },
                 selected = type == activeTopNavOption,
-                onClick = { onClick(type) }
+                onClick = { onClick(type) },
             )
         }
     }

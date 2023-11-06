@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.navigation.MainNavOption
+import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.ui.DataViewModel
 import com.example.thewatchlist.ui.MainNavState
 import com.example.thewatchlist.ui.TabNavigation
@@ -64,7 +65,12 @@ fun MovieScreen(
         TabNavigation(
             activeTopNavOption = mainNavState.activeMovieNavItem,
             topNavItems = mainNavState.topNavMovieItems,
-            onClick = { mainNavState.setMovieNavItem(it) })
+            onClick = {
+                dataViewModel.clearNotifications(mediaItems)
+                mainNavState.setMovieNavItem(it)
+            },
+            mediaItems = dataViewModel.mediaList.filter { it is Movie }
+        )
 
         LazyColumn {
             mediaItems.forEach {

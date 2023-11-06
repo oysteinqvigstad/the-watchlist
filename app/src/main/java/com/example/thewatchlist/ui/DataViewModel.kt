@@ -17,9 +17,11 @@ import com.example.thewatchlist.WatchlistApplication
 import com.example.thewatchlist.data.Episode
 import com.example.thewatchlist.data.Media
 import com.example.thewatchlist.data.MediaRepository
+import com.example.thewatchlist.data.Movie
 import com.example.thewatchlist.data.SearchStatus
 import com.example.thewatchlist.data.Season
 import com.example.thewatchlist.data.TV
+import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.data.persistence.StorageRepository
 import kotlinx.coroutines.launch
@@ -231,8 +233,9 @@ class DataViewModel(
     fun moveMediaTo(media: Media, tab: TopNavOption?) {
         mediaList.remove(media)
         if (tab != null) {
+            media.notify = true
             media.status = tab
-            mediaList.add(media)
+            mediaList.add(0, media)
         }
 
         // update local database
@@ -242,6 +245,21 @@ class DataViewModel(
             else -> updateDbEntry(media)
         }
     }
+
+    fun clearNotifications(media: List<Media>) {
+        media.forEach {
+            it.notify = false
+            updateMediaEntry(it)
+        }
+    }
+
+    fun clearNotification(media: Media) {
+        when (media) {
+            is TV -> updateMediaEntry(media.copy(notify = false))
+            is Movie -> updateMediaEntry(media.copy(notify = false))
+        }
+    }
+
 
     /**
      * Function to trigger update of season info and episodes if more than 12 hours have passed
