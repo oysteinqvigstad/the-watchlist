@@ -16,10 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -273,7 +275,9 @@ fun BannerPrimaryAction(media: Media, dataViewModel: DataViewModel, activeBottom
                 BannerActionButton(media = media, label = "Add to Watchlist", action = { dataViewModel.moveMediaTo(it, TopNavOption.ToWatch) }, icon = Icons.Filled.Add)
             }
         } else if (media.status == TopNavOption.History) {
-            BannerActionButton(media = media, label = "Delete", action = { dataViewModel.moveMediaTo(it, null) }, color = RemoveColor, icon = Icons.Filled.Clear)
+            BannerActionButton(media = media, action = { dataViewModel.moveMediaTo(it, TopNavOption.ToWatch) }, icon = Icons.Filled.Refresh)
+            Spacer(modifier = Modifier.padding(start = 5.dp))
+            BannerActionButton(media = media, action = { dataViewModel.moveMediaTo(it, null) }, color = RemoveColor, icon = Icons.Filled.Clear)
         } else if (media is TV && media.status == TopNavOption.ToWatch) {
             BannerActionButton(media = media, label = "Start Tracking", action = { dataViewModel.moveMediaTo(it, TopNavOption.Watching) }, icon = Icons.Filled.PlayArrow)
         } else if (media is TV && media.status == TopNavOption.Watching) {
@@ -324,17 +328,14 @@ fun AddButton(
 @Composable
 fun BannerActionButton(
     media: Media,
-    label: String,
+    label: String = "",
     action: (Media) -> Unit,
     color: Color = KashmirBlue,
     icon: ImageVector? = null
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
             .padding(top = 15.dp),
-
-        horizontalArrangement = Arrangement.End
     ) {
         Button(
             onClick = { action(media) },
