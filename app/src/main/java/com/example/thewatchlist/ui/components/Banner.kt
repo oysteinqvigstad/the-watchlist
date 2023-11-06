@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
@@ -22,7 +24,9 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material3.Badge
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -31,8 +35,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -113,7 +119,8 @@ fun Banner(
                     .fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp)
             ) {
-                TitleHeader(title = media.title)
+                val showNotify = activeBottomNav != MainNavOption.Search && media.notify
+                TitleHeader(media, showNotify)
 
                 if (media is TV && activeBottomNav != MainNavOption.Search) {
                     ProgressBarRemainingEpisodes(media)
@@ -132,20 +139,39 @@ fun Banner(
 }
 
 /**
- *  Composable function for displaying the title header
+ *  Composable function for displaying the title header and notification text
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TitleHeader(title: String) {
-    Text(
-        text = title,
-        fontSize = 18.sp,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = Modifier
-            .padding(top = 10.dp, bottom = 5.dp)
-    )
+fun TitleHeader(
+    media: Media,
+    showNotify: Boolean
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 5.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = media.title,
+            fontSize = 18.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+        if (showNotify) {
+            Badge {
+                Text(text = media.notifyText)
+            }
+        }
+
+    }
+
 }
 
+/**
+ * Show up to three genres on a single line
+ */
 @Composable
 fun GenresText(genres: List<Genre>) {
     Text(text = genres.take(3).joinToString(", ") { it.name },

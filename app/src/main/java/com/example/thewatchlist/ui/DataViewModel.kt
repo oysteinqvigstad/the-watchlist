@@ -25,6 +25,7 @@ import com.example.thewatchlist.data.navigation.MainNavOption
 import com.example.thewatchlist.data.navigation.TopNavOption
 import com.example.thewatchlist.data.persistence.StorageRepository
 import kotlinx.coroutines.launch
+import okhttp3.internal.notify
 import java.io.IOException
 import java.util.Date
 import kotlin.time.Duration.Companion.hours
@@ -231,8 +232,14 @@ class DataViewModel(
      * @param tab The target tab to move the media item to.
      */
     fun moveMediaTo(media: Media, tab: TopNavOption?) {
+
         mediaList.remove(media)
         if (tab != null) {
+            media.notifyText = "Recently " + when (tab) {
+                TopNavOption.ToWatch -> "added"
+                TopNavOption.Watching -> "started"
+                TopNavOption.History -> "archived"
+            }
             media.notify = true
             media.status = tab
             mediaList.add(0, media)
@@ -306,6 +313,10 @@ class DataViewModel(
                     }.sortedBy { it.episodeNumber })
                 }
             })
+            if (newTv.seasons.sumOf { it.episodes.size } > tv.seasons.sumOf { it.episodes.size }) {
+                newTv.notify = true
+                newTv.notifyText = "New episodes available"
+            }
             updateMediaEntry(newTv)
         } catch (e: Exception) {
             Log.d("app", "failed to update episode information")
