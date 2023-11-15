@@ -170,7 +170,7 @@ fun TitleHeader(
 }
 
 /**
- * Show up to three genres on a single line
+ * Composable function that displays up to three media genres on a single line
  */
 @Composable
 fun GenresText(genres: List<Genre>) {
@@ -181,6 +181,9 @@ fun GenresText(genres: List<Genre>) {
     )
 }
 
+/**
+ * Composable function that displays a row of brief information about a TV Show/Movie
+ */
 @Composable
 fun BriefInfoText(media: Media) {
     Text(

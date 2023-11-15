@@ -52,7 +52,6 @@ fun DetailScreen(
             },
             title = { Text(text = media.title) }
         )
-        // TODO: handle redirect if null
         DetailedInfo(media = media, dataViewModel = dataViewModel)
     }
 }

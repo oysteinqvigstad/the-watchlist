@@ -7,9 +7,11 @@ import info.movito.themoviedbapi.model.tv.TvEpisode
 import info.movito.themoviedbapi.model.tv.TvSeries
 import java.util.Date
 
-
-interface Media { // make this data class
-
+/**
+ * An interface defining the properties and behaviours common to all media types.
+ * This includes movies and TV shows, encapsulating shared attributes like title, genres, and more.
+ */
+interface Media {
     var status: TopNavOption
     val id: Int
     val title: String
@@ -22,6 +24,11 @@ interface Media { // make this data class
     var notifyText: String
 }
 
+/**
+ * Data class representing a Movie.
+ * It extends from the Media interface, incorporating specific attributes for movies.
+ * This includes the movie's ID, title, runtime, genres, release year, and additional properties.
+ */
 data class Movie (
     override val id: Int,
     override val title: String,
@@ -45,6 +52,11 @@ data class Movie (
     )
 }
 
+/**
+ * Data class representing a TV show.
+ * It includes specific attributes for TV shows such as number of episodes, seasons, and last updated date.
+ * Extends from the Media interface to include common media properties.
+ */
 data class TV (
     override val id: Int,
     override val title: String,
@@ -78,7 +90,10 @@ data class TV (
     )
 }
 
-
+/**
+ * Data class representing a Season of a TV show.
+ * It includes properties like season ID, title, season number, and a list of episodes.
+ */
 data class Season (
     val id: Int,
     val title: String,
@@ -86,6 +101,11 @@ data class Season (
     var episodes: List<Episode>
 )
 
+/**
+ * Data class representing an Episode of a TV show.
+ * Contains detailed information about a specific episode, including its ID, episode number, season number, air date, title, and overview.
+ * Also includes a 'seen' flag to track if the episode has been watched.
+ */
 data class Episode (
     val id: Int,
     val episodeNumber: Int,

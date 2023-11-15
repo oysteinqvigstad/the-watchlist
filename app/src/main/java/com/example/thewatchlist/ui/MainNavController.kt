@@ -138,7 +138,6 @@ fun MainNavController(
                 DetailScreen(
                     navController = navController,
                     dataViewModel = dataViewModel,
-                    // TODO: Handle this null case
                     media = dataViewModel.detailsMediaItem!!
                 )
             }
@@ -194,6 +193,12 @@ fun TabNavigation(
     }
 }
 
+/**
+ * Allows a user to share an active list in text form with the use of Android Share Intent
+ *
+ * @param context Context from which the share is initiated.
+ * @param textToShare Text to be shared.
+ */
 fun shareContent(context: Context, textToShare: String) {
     val shareIntent = Intent().apply {
         action = Intent.ACTION_SEND
