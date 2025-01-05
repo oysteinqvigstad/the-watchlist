@@ -1,8 +1,8 @@
-# The Watchlist
+# TheWatchlist
 
 ## About
 
-TheWatchlist is a streamlined mobile application designed to help users track their entertainment consumption without unnecessary extras. The app provides a clean and straightforward way to manage both movies and TV shows in separate watchlists. For TV series, users can track their progress at both episode and season levels, while movies can be organized into "To Watch" and "History" categories.
+TheWatchlist is a solution to a common hassle: keeping track of what movies you want to watch and where you are in TV shows. This mobile app stands out by narrowing the focus on tracking viewing progress, without the unnecessary extras of online communities, recommendations, ads, and so on
 
 This project was developed as part of the Mobile Programming (PROG2007) course at NTNU during the 2023 academic year. The project team consisted of Idar Mykløy, Marthe Sjaaeng, Thea Urke Remøy, and Øystein Qvigstad. The application was built using Kotlin and Jetpack Compose, integrating TheMovieDB API for content information.
 
